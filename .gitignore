@@ -1,0 +1,19 @@
+# Jekyll build output (under /docs)
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/.sass-cache/
+
+# Bundler
+docs/.bundle/
+docs/vendor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~

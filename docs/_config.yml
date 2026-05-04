@@ -1,0 +1,42 @@
+# Site
+title: The Alignment Foundry
+description: The workshop behind the work — ideas, industry insights, and resources for enterprise AI alignment.
+tagline: Ideas, industry insights, and resources for enterprise AI alignment.
+lang: en
+
+# Author
+author:
+  name: Alex S. Moy
+  url: https://alexsmoy.com
+
+# URLs (project site at alexsmoy.github.io/alignment-foundry)
+url: https://alexsmoy.github.io
+baseurl: /alignment-foundry
+
+# Build
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+# Plugins (all GitHub Pages-supported)
+plugins:
+  - jekyll-seo-tag
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: page
+
+# Exclude from build
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - .bundle/
+  - .jekyll-cache/

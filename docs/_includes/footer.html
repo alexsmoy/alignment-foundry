@@ -1,0 +1,23 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="container footer-grid">
+    <div>
+      <p class="footer-brand">{{ site.title }}</p>
+      <p class="footer-tagline">{{ site.tagline }}</p>
+    </div>
+    <div>
+      <p class="footer-heading">Connect</p>
+      <ul class="footer-links">
+        <li><a href="https://alexsmoy.com">alexsmoy.com</a></li>
+        <li><a href="https://linkedin.com/in/alexsmoy">LinkedIn</a></li>
+        <li><a href="{{ '/feed.xml' | relative_url }}">RSS</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-heading">License</p>
+      <p class="footer-fineprint">Code: <a href="https://opensource.org/licenses/MIT">MIT</a> · Content: <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></p>
+    </div>
+  </div>
+  <div class="container footer-meta">
+    <p>&copy; {{ site.time | date: '%Y' }} {{ site.author.name }}. Lead with faith. Empower people. Transform through alignment.</p>
+  </div>
+</footer>

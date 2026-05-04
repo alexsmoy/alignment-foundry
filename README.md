@@ -6,18 +6,59 @@ AI doesn't fail because of technology. It fails because leaders, teams, and stra
 
 **Alignment Foundry** is the workspace behind [alexsmoy.com](https://alexsmoy.com). It hosts the tools, ideas, and thinking I'm developing at the intersection of enterprise AI strategy, Centers of Excellence, and coalition-building.
 
+The published site lives at **[alexsmoy.github.io/alignment-foundry](https://alexsmoy.github.io/alignment-foundry)**.
+
 ---
 
 ## What's Here
 
-### 🔧 Build Ideas
+### 🔧 Projects
 Workspace experiments, prototypes, and GitHub Pages projects exploring how enterprise leaders can harness AI as a tool — not a takeover. Early-stage, honest, and in progress.
 
-### 📬 Industry Newsletters
-Curated insights on enterprise AI transformation, governance, and change management — shared with leaders navigating the gap between AI potential and real-world adoption.
+### 📊 Reports
+Curated one-page interactive briefings on major industry conferences and enterprise AI trend reports. Self-contained HTML, built to be skimmed in five minutes.
 
-### 🌐 GitHub Pages
-Published resources, frameworks, and reference material built from this repo. Live at [alexsmoy.github.io/alignment-foundry](https://alexsmoy.github.io/alignment-foundry).
+### 📚 Resources
+Published frameworks and reference material — the practical artifacts that help leaders ground AI transformation in governance, accountability, and people.
+
+### 📬 Industry Newsletters *(coming soon)*
+Curated insights on enterprise AI transformation, governance, and change management. Mechanics TBD.
+
+---
+
+## Repository Structure
+
+The published Jekyll site lives in `/docs`, built and served by the default GitHub Pages pipeline (no custom Actions workflow):
+
+```
+.
+├── docs/                    # Jekyll source for the published site
+│   ├── _config.yml
+│   ├── Gemfile              # pinned to the github-pages gem
+│   ├── _layouts/            # custom brand layouts (no upstream theme)
+│   ├── _includes/           # head, nav, footer
+│   ├── assets/css/          # brand palette + Hanken Grotesk typography
+│   ├── reports/             # self-contained interactive HTML briefings
+│   ├── index.md             # homepage
+│   ├── about.md
+│   ├── projects.md
+│   ├── resources.md
+│   └── 404.html
+├── README.md
+└── LICENSE
+```
+
+GitHub Pages is configured to deploy from the `main` branch, `/docs` folder.
+
+## Local Development
+
+```bash
+cd docs
+bundle install
+bundle exec jekyll serve
+```
+
+Site preview at <http://localhost:4000/alignment-foundry/>.
 
 ---
 
