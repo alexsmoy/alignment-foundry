@@ -9,18 +9,10 @@ Each report is a self-contained one-page interactive HTML briefing — built to 
 
 ## Published
 
-No reports have been published yet. The first set is in preparation.
-
-When live, each entry will appear below as a card linking to the standalone report.
-
-<!--
-  Example card structure for a published report:
-
-  <div class="card-grid">
-    <a class="card" href="{{ '/reports/2026-q1-enterprise-ai-trends.html' | relative_url }}">
-      <p class="card-meta">Q1 2026 · Trend Report</p>
-      <h3>Enterprise AI Trends — Q1 2026</h3>
-      <p>What enterprise AI leaders are prioritizing this quarter, with signal pulled from analyst briefings and industry surveys.</p>
-    </a>
-  </div>
--->
+<div class="card-grid">
+  <a class="card" href="{{ '/reports/2026-04-google-cloud-next-agent-governance.html' | relative_url }}">
+    <p class="card-meta">April 2026 · Conference Briefing</p>
+    <h3>Who Governs Your AI? — The 5 Layers of Agent Governance</h3>
+    <p>A field guide drawn from the 260 announcements at Google Cloud Next ’26: Identity, Memory, Permission, Security, and Oversight — the leadership decisions every enterprise must make before agents can deliver at scale.</p>
+  </a>
+</div>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Who Governs Your AI? — The 5 Layers of Agent Governance · Alex S. Moy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --deep-blue:#0A2342;--deep-aqua:#14786C;--charcoal:#1C1C1E;
+  --aquamarine:#67FCF1;--light-teal:#96E5AC;--white:#FFFFFF;
+  --gradient:linear-gradient(135deg,#0A2342 0%,#14786C 55%,#67FCF1 100%);
+  --w90:rgba(255,255,255,.90);--w60:rgba(255,255,255,.60);
+  --w30:rgba(255,255,255,.30);--w10:rgba(255,255,255,.10);
+  --w06:rgba(255,255,255,.06);
+  --aq20:rgba(103,252,241,.20);--aq10:rgba(103,252,241,.10);--aq06:rgba(103,252,241,.06);
+  --font:'Hanken Grotesk',sans-serif;
+  --sec:96px;--maxw:1200px;--gutter:48px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--deep-blue);color:var(--white);font-family:var(--font);font-size:17px;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--deep-blue)}::-webkit-scrollbar-thumb{background:var(--aquamarine)}
+.inner{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,35,66,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--w10)}
+.nav-inner{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter);height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-weight:700;font-size:15px;color:var(--white);letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--aquamarine)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{font-size:13px;font-weight:500;color:var(--w60);text-decoration:none;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--aquamarine)}
+/* HERO */
+.hero{min-height:100vh;background:var(--deep-blue);display:flex;flex-direction:column;justify-content:flex-end;padding-top:64px;overflow:hidden;position:relative}
+.hero-backdrop{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 80% 20%,rgba(20,120,108,.35) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 10% 70%,rgba(103,252,241,.08) 0%,transparent 55%),var(--deep-blue);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(103,252,241,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(103,252,241,.04) 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(to bottom,transparent,rgba(0,0,0,.4) 30%,rgba(0,0,0,.4) 70%,transparent);pointer-events:none}
+.hero-content{position:relative;z-index:2;padding:var(--sec) var(--gutter) 80px;max-width:var(--maxw);margin:0 auto;width:100%}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.ey-line{width:32px;height:2px;background:var(--aquamarine)}
+.ey-text{font-size:13px;font-weight:500;color:var(--aquamarine);letter-spacing:.06em}
+.hero h1{font-size:clamp(40px,6.5vw,80px);font-weight:700;line-height:1.05;letter-spacing:-.025em;color:var(--white);max-width:820px;margin-bottom:28px}
+.hero h1 .aq{color:var(--aquamarine)}
+.hero-sub{font-size:19px;font-weight:400;color:var(--w90);line-height:1.65;max-width:620px;margin-bottom:52px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--w10);padding-top:32px}
+.hm-item{padding:0 40px 0 0}
+.hm-label{font-size:11px;font-weight:500;color:var(--w60);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.hm-value{font-size:14px;font-weight:700;color:var(--white)}
+.hm-value.aq{color:var(--aquamarine)}
+/* SECTION LABELS */
+.s-eye{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.s-eye .ln{width:28px;height:2px;background:var(--aquamarine)}
+.s-eye .lb{font-size:12px;font-weight:500;color:var(--aquamarine);letter-spacing:.08em;text-transform:uppercase}
+.s-head{font-size:clamp(28px,3.5vw,44px);font-weight:700;line-height:1.15;letter-spacing:-.02em;color:var(--white);margin-bottom:16px}
+.s-head .aq{color:var(--aquamarine)}
+.s-intro{font-size:17px;font-weight:400;color:var(--w90);max-width:640px;line-height:1.7;margin-bottom:60px}
+/* INTRO */
+.intro-sec{padding:var(--sec) 0;background:var(--deep-blue);border-top:1px solid var(--w10)}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:60px}
+.ic{background:var(--w06);border:1px solid var(--w10);padding:36px 32px;position:relative;transition:background .25s}
+.ic:hover{background:var(--w10)}
+.ic::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--deep-aqua);transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.ic:hover::before{transform:scaleX(1)}
+.ic-num{font-size:11px;font-weight:700;color:var(--deep-aqua);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.ic h3{font-size:17px;font-weight:700;color:var(--white);margin-bottom:12px;line-height:1.3}
+.ic p{font-size:15px;font-weight:400;color:var(--w90);line-height:1.65}
+/* PULL QUOTE */
+.pq{padding:32px 40px;border-left:4px solid var(--aquamarine);background:var(--aq06);margin:0 0 60px}
+.pq p{font-size:24px;font-weight:700;color:var(--deep-aqua);line-height:1.45;margin-bottom:12px}
+.pq cite{font-size:13px;font-weight:500;color:var(--w60);letter-spacing:.04em;font-style:normal}
+/* NUMBERS */
+.num-row{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.nc{background:var(--w06);border:1px solid var(--w10);padding:32px 28px;text-align:center}
+.nb{font-size:52px;font-weight:700;color:var(--aquamarine);line-height:1;letter-spacing:-.02em;margin-bottom:10px}
+.nl{font-size:14px;font-weight:500;color:var(--w90);line-height:1.4;margin-bottom:8px}
+.ns{font-size:11px;font-weight:400;color:var(--w60)}
+/* LAYERS */
+.layers-sec{padding:var(--sec) 0;background:var(--charcoal);border-top:1px solid var(--w10);border-bottom:1px solid var(--w10)}
+.tab-strip{display:flex;gap:2px;background:rgba(10,35,66,.6);border:1px solid var(--w10);padding:4px;margin-bottom:48px;flex-wrap:wrap}
+.tb{flex:1;min-width:160px;padding:14px 18px;background:transparent;border:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;color:var(--w60);text-align:left;transition:all .22s;display:flex;flex-direction:column;gap:3px;letter-spacing:.01em;border-radius:2px}
+.tb:hover{color:var(--white);background:var(--w06)}
+.tb.active{background:var(--deep-aqua);color:var(--white)}
+.tb .tn{font-size:10px;font-weight:500;opacity:.7;letter-spacing:.08em;text-transform:uppercase}
+.tb.active .tn{opacity:.85}
+.lp{display:none;grid-template-columns:1fr 1fr;gap:2px;animation:pin .35s ease}
+.lp.active{display:grid}
+@keyframes pin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.lm{background:var(--deep-blue);border:1px solid var(--w10);padding:52px 48px;position:relative;overflow:hidden}
+.lm::after{content:attr(data-n);position:absolute;bottom:-16px;right:20px;font-size:180px;font-weight:700;color:rgba(255,255,255,.04);line-height:1;pointer-events:none;letter-spacing:-.04em}
+.l-icon{width:52px;height:52px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:28px;background:var(--aq10);border:1px solid var(--aq20)}
+.lm h2{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.02em;color:var(--white);margin-bottom:6px}
+.l-tag{font-size:12px;font-weight:700;color:var(--aquamarine);letter-spacing:.08em;text-transform:uppercase;margin-bottom:24px;display:block}
+.lm p{font-size:16px;font-weight:400;color:var(--w90);line-height:1.75;margin-bottom:16px}
+.lm p strong{font-weight:700;color:var(--white)}
+.why{margin-top:28px;padding:20px 24px;background:var(--aq06);border-left:3px solid var(--aquamarine)}
+.why-lb{font-size:10px;font-weight:700;color:var(--aquamarine);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.why p{font-size:15px;font-weight:400;color:var(--w90);line-height:1.65;margin:0}
+.l-sidebar{display:flex;flex-direction:column;gap:2px}
+.ai{background:rgba(10,35,66,.5);border:1px solid var(--w10);cursor:pointer;transition:background .2s;overflow:hidden}
+.ai:hover,.ai.open{background:var(--deep-blue)}
+.ai.open{border-color:var(--w30)}
+.ai-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 24px}
+.ai-title{font-size:14px;font-weight:700;color:var(--white);line-height:1.3}
+.ai-tog{width:22px;height:22px;border-radius:50%;background:var(--w10);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--w60);flex-shrink:0;transition:all .22s;font-weight:500}
+.ai.open .ai-tog{background:var(--aquamarine);color:var(--deep-blue);transform:rotate(45deg);font-weight:700}
+.ai-bd{display:none;padding:0 24px 20px;border-top:1px solid var(--w10)}
+.ai.open .ai-bd{display:block}
+.ai-bd p{font-size:14px;font-weight:400;color:var(--w90);line-height:1.65;padding-top:16px}
+.ai-stat{margin-top:14px;display:flex;align-items:baseline;gap:8px}
+.sv{font-size:28px;font-weight:700;color:var(--aquamarine);line-height:1}
+.sl{font-size:13px;font-weight:400;color:var(--w60)}
+/* RESULTS */
+.results-sec{padding:var(--sec) 0;background:var(--deep-blue);border-top:1px solid var(--w10)}
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.rc{background:var(--w06);border:1px solid var(--w10);padding:36px 32px;transition:all .25s;position:relative;overflow:hidden}
+.rc:hover{background:var(--w10);transform:translateY(-2px)}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gradient);transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+.rc:hover::after{transform:scaleX(1)}
+.rco{font-size:11px;font-weight:700;color:var(--deep-aqua);letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px}
+.rn{font-size:54px;font-weight:700;color:var(--aquamarine);line-height:1;letter-spacing:-.02em;margin-bottom:8px}
+.rl{font-size:14px;font-weight:500;color:var(--white);margin-bottom:18px;line-height:1.4}
+.rd{font-size:14px;font-weight:400;color:var(--w60);line-height:1.6;border-top:1px solid var(--w10);padding-top:16px}
+/* COMPETE */
+.compete-sec{padding:var(--sec) 0;background:var(--charcoal);border-top:1px solid var(--w10);border-bottom:1px solid var(--w10)}
+table.ct{width:100%;border-collapse:collapse;font-family:var(--font);margin-top:8px}
+.ct th{padding:14px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--w60);letter-spacing:.1em;text-transform:uppercase;border-bottom:2px solid var(--w10)}
+.ct td{padding:20px;font-size:14px;font-weight:400;color:var(--w90);line-height:1.55;border-bottom:1px solid var(--w10);vertical-align:top}
+.ct tr:hover td{background:var(--w06)}
+.pn{font-size:15px;font-weight:700;color:var(--white);display:block;margin-bottom:6px}
+.pb{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;letter-spacing:.07em;text-transform:uppercase;border-radius:2px}
+.bg{background:var(--aq20);color:var(--aquamarine)}
+.bm{background:rgba(20,120,108,.2);color:var(--light-teal)}
+.ba{background:rgba(150,229,172,.15);color:var(--light-teal)}
+.bo{background:rgba(103,252,241,.1);color:var(--aquamarine)}
+.ban{background:rgba(20,120,108,.15);color:var(--aquamarine)}
+.dots{display:flex;gap:4px;margin-top:8px}
+.d{width:8px;height:8px;border-radius:1px;background:var(--w10)}
+.d.on{background:var(--aquamarine)}
+/* TIMELINE */
+.tl-sec{padding:var(--sec) 0;background:var(--deep-blue);border-top:1px solid var(--w10)}
+.tl{position:relative;padding-left:52px}
+.tl::before{content:'';position:absolute;left:10px;top:6px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--aquamarine),var(--deep-aqua),transparent)}
+.ti{position:relative;margin-bottom:44px;opacity:0;transform:translateX(-8px);transition:opacity .5s ease,transform .5s ease}
+.ti.visible{opacity:1;transform:translateX(0)}
+.td{position:absolute;left:-46px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--deep-blue);border:2px solid var(--aquamarine);transition:background .25s}
+.ti:hover .td{background:var(--aquamarine)}
+.t-date{font-size:11px;font-weight:700;color:var(--aquamarine);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.t-title{font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px}
+.t-desc{font-size:14px;font-weight:400;color:var(--w60);line-height:1.65}
+/* CTA */
+.cta{padding:80px var(--gutter);background:var(--gradient);text-align:center}
+.cta h2{font-size:clamp(24px,3.5vw,40px);font-weight:700;color:var(--white);letter-spacing:-.02em;margin-bottom:16px}
+.cta p{font-size:17px;font-weight:400;color:rgba(255,255,255,.85);max-width:580px;margin:0 auto 36px;line-height:1.7}
+.cta-btn{display:inline-block;background:var(--aquamarine);color:var(--deep-blue);font-family:var(--font);font-size:16px;font-weight:700;padding:16px 40px;border-radius:4px;text-decoration:none;letter-spacing:.02em;transition:background .2s}
+.cta-btn:hover{background:#ffffff}
+/* CITATIONS */
+.cite-sec{padding:var(--sec) 0;background:var(--charcoal);border-top:1px solid var(--w10)}
+.cg{display:grid;grid-template-columns:repeat(2,1fr);gap:2px}
+a.cc{display:flex;gap:16px;padding:18px 20px;background:var(--w06);border:1px solid var(--w10);text-decoration:none;color:inherit;transition:all .2s}
+a.cc:hover{background:var(--w10);border-color:var(--w30)}
+.cn{font-size:12px;font-weight:700;color:var(--aquamarine);min-width:24px;padding-top:1px}
+.cc-c{flex:1}
+.cc-t{font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px}
+.cc-m{font-size:11px;font-weight:400;color:var(--w60)}
+.cc-a{font-size:16px;color:var(--w30);align-self:center;transition:all .2s}
+a.cc:hover .cc-a{color:var(--aquamarine);transform:translateX(4px)}
+/* FOOTER */
+footer{padding:36px var(--gutter);background:var(--deep-blue);border-top:1px solid var(--w10)}
+.fi{max-width:var(--maxw);margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+footer p{font-size:13px;font-weight:400;color:var(--w60)}
+.fb{font-size:13px;font-weight:700;color:var(--aquamarine)}
+/* SCROLL REVEAL */
+.fu{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+.fu.visible{opacity:1;transform:translateY(0)}
+/* RESPONSIVE */
+@media(max-width:960px){
+  :root{--gutter:24px;--sec:64px}
+  .three-col,.rg{grid-template-columns:1fr}
+  .num-row{grid-template-columns:1fr 1fr}
+  .lp.active{grid-template-columns:1fr}
+  .cg{grid-template-columns:1fr}
+  .tab-strip{flex-direction:column}
+  .tb{min-width:unset}
+  .nav-links{display:none}
+  .ct th:nth-child(4),.ct td:nth-child(4){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand"><div class="nav-dot"></div>Alex S. Moy &mdash; AI Alignment Report</div>
+    <ul class="nav-links">
+      <li><a href="#governance">5 Layers</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#competition">Landscape</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-backdrop"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="ey-line"></div>
+      <span class="ey-text">Google Cloud Next &rsquo;26 &nbsp;&middot;&nbsp; Las Vegas &nbsp;&middot;&nbsp; April 22&ndash;25, 2026</span>
+    </div>
+    <h1>Who governs<br>your <span class="aq">AI?</span></h1>
+    <p class="hero-sub">Agents are already inside your enterprise &mdash; executing workflows, processing decisions, and operating at machine speed. The question isn't whether to deploy them. It's whether you've built the governance to lead them.</p>
+    <div class="hero-meta">
+      <div class="hm-item"><div class="hm-label">Based on</div><div class="hm-value aq">260 announcements</div></div>
+      <div class="hm-item"><div class="hm-label">Primary focus</div><div class="hm-value">Agent Governance</div></div>
+      <div class="hm-item"><div class="hm-label">Published</div><div class="hm-value">April 28, 2026</div></div>
+      <div class="hm-item"><div class="hm-label">Author</div><div class="hm-value">Alex S. Moy</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="intro-sec" id="intro">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">The moment we're in</span></div>
+    <h2 class="s-head">AI has moved from <span class="aq">advisor to actor.</span></h2>
+    <p class="s-intro">For years, AI was advisory &mdash; surfacing insights, suggesting next steps. Now it's operational. Agents take actions, process decisions, and run multi-step workflows autonomously. That shift changes everything about how enterprise leaders need to govern, align, and scale this technology. AI should be a tool, not a takeover.</p>
+    <div class="three-col fu">
+      <div class="ic">
+        <div class="ic-num">Context 01</div>
+        <h3>The shift from advisor to actor</h3>
+        <p>An AI agent doesn't wait to be asked. It reasons through a problem, selects the right tools, and executes multi-step workflows &mdash; booking meetings, processing orders, writing code &mdash; without a human directing every move.</p>
+      </div>
+      <div class="ic">
+        <div class="ic-num">Context 02</div>
+        <h3>The governance gap is already open</h3>
+        <p>The average enterprise now runs 12 AI agents. 89% of business teams are already using them. Most have no unified framework to govern them. That gap &mdash; between adoption speed and governance readiness &mdash; is where risk accumulates.</p>
+      </div>
+      <div class="ic">
+        <div class="ic-num">Context 03</div>
+        <h3>Governance is how we build trust at scale</h3>
+        <p>Governance isn't a compliance exercise. It's the operating system that lets you deploy AI broadly, hold it accountable, and build the coalition of leaders and teams who trust it enough to actually use it. Alignment is the currency of enterprise success.</p>
+      </div>
+    </div>
+    <div class="pq fu">
+      <p>&ldquo;The era of the pilot is over. The era of the agent is here.&rdquo;</p>
+      <cite>Thomas Kurian, CEO Google Cloud &mdash; April 22, 2026 &nbsp;¹</cite>
+    </div>
+    <div class="num-row fu">
+      <div class="nc"><div class="nb">89%</div><div class="nl">of business teams already using AI agents</div><div class="ns">Google AI Agent Trends Report, 2026</div></div>
+      <div class="nc"><div class="nb">12</div><div class="nl">average AI agents per enterprise organization</div><div class="ns">Google AI Agent Trends Report, 2026</div></div>
+      <div class="nc"><div class="nb">40%</div><div class="nl">of enterprise apps will embed AI agents by end of 2026</div><div class="ns">Gartner, March 2026</div></div>
+      <div class="nc"><div class="nb">260</div><div class="nl">product announcements at Google Cloud Next &rsquo;26</div><div class="ns">Google Cloud Blog, April 2026</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIVE LAYERS -->
+<section class="layers-sec" id="governance">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">The core framework</span></div>
+    <h2 class="s-head">The five layers of agent governance</h2>
+    <p class="s-intro">Alignment is the currency of enterprise success. Google's strategy for the agentic enterprise is built on five decisions every leader must make before AI can deliver at scale. Each layer builds on the one before it &mdash; and each one is a leadership decision, not just a technical configuration.</p>
+    <div class="tab-strip" role="tablist">
+      <button class="tb active" onclick="showLayer(1)" role="tab"><span class="tn">Layer 01</span>Identity</button>
+      <button class="tb" onclick="showLayer(2)" role="tab"><span class="tn">Layer 02</span>Memory</button>
+      <button class="tb" onclick="showLayer(3)" role="tab"><span class="tn">Layer 03</span>Permission</button>
+      <button class="tb" onclick="showLayer(4)" role="tab"><span class="tn">Layer 04</span>Security</button>
+      <button class="tb" onclick="showLayer(5)" role="tab"><span class="tn">Layer 05</span>Oversight</button>
+    </div>
+
+    <!-- L1 -->
+    <div class="lp active" id="layer-1">
+      <div class="lm" data-n="1">
+        <div class="l-icon">🪪</div>
+        <h2>Who is the agent?</h2>
+        <span class="l-tag">Identity &amp; authentication</span>
+        <p>Every agent operating inside your enterprise needs a verified, auditable identity. Before any action is taken, before any system is touched, the agent must be known &mdash; not assumed. Identity is what separates a governed fleet from an unaccountable one.</p>
+        <p>Google's <strong>Agent Identity</strong> system assigns each agent a unique cryptographic ID &mdash; a tamper-proof digital fingerprint tied to defined authorization policies. Every action traces back to that identity, creating an audit trail that compliance and leadership teams can actually trust.</p>
+        <p>This matters most as organizations scale. Agents can spawn sub-agents. Those sub-agents can create more. Without identity at every layer, accountability disappears faster than the value you were trying to create.</p>
+        <div class="why"><div class="why-lb">The governance principle</div><p>You cannot hold AI accountable for its actions unless you know which agent took them. Identity is the non-negotiable foundation. Every other layer depends on it.</p></div>
+      </div>
+      <div class="l-sidebar">
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Identity &mdash; cryptographic verification</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Each agent receives a unique cryptographic ID that creates a tamper-proof audit trail for every action taken, mapped back to defined authorization policies. This is how enterprises move from "we think the agent did this" to "we can prove it, and here's the full record."</p><div class="ai-stat"><span class="sv">100%</span><span class="sl">of agent actions traceable to a verified identity</span></div></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Registry &mdash; enterprise-wide visibility</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>A centralized registry of every approved agent in your organization. Registration is a prerequisite for operation &mdash; not a formality after the fact. This gives leadership a real-time view of what's deployed, who authorized it, and what it's doing.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Custom Session IDs &mdash; system-level traceability</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Agent interactions can be linked directly to your internal tracking and CRM systems via Custom Session IDs. Every customer-facing agent session connects to an auditable business record &mdash; closing the gap between AI activity and enterprise accountability.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">AI-Bill of Materials &mdash; shadow AI detection</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Part of Google's $32 billion Wiz acquisition, the AI-BOM automatically inventories every AI framework, model, and tool deployed across your organization &mdash; including tools teams added without approval. Technology alone doesn't transform companies. But ungoverned technology can quietly undermine the ones that are trying.</p><div class="ai-stat"><span class="sv">Full</span><span class="sl">visibility across all environments, including shadow AI</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- L2 -->
+    <div class="lp" id="layer-2">
+      <div class="lm" data-n="2">
+        <div class="l-icon">🧠</div>
+        <h2>What does the agent know?</h2>
+        <span class="l-tag">Memory &amp; context</span>
+        <p>An agent without context is an agent without judgment. The ability to recall past interactions, understand organizational meaning, and connect current tasks to prior history is what separates a capable agent from a genuinely valuable one.</p>
+        <p>But memory without governance is a liability. An agent with unrestricted recall across teams and data estates can expose information it was never meant to access. The answer isn't less memory &mdash; it's better-scoped memory.</p>
+        <p>Google's <strong>Agent Memory Bank</strong> provides controlled, long-term memory governed by <strong>Memory Profiles</strong> that keep context accurate and appropriately bounded. The <strong>Knowledge Catalog</strong> gives agents a semantically rich map of your enterprise's data &mdash; so they understand what your organization's language actually means, not just what the words say.</p>
+        <div class="why"><div class="why-lb">The coalition dimension</div><p>When agents understand your organizational context, they become part of the team &mdash; not just a tool running in the background. That shared understanding is what builds the human-AI coalition that drives real adoption and real ROI.</p></div>
+      </div>
+      <div class="l-sidebar">
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Memory Bank &mdash; governed long-term recall</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Dynamically generates and curates long-term memories from agent interactions. Memory Profiles ensure high-accuracy recall at low latency &mdash; personalizing every engagement without compromising data boundaries between users, teams, or use cases.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Knowledge Catalog &mdash; organizational context engine</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Maps and infers business meaning across your entire data estate. When your agents understand what "Q3 revenue," "the Johnson account," or "our current risk threshold" actually means inside your organization, they stop being generic tools and start functioning as informed members of your operating model.</p><div class="ai-stat"><span class="sv">Cross</span><span class="sl">-cloud data access unified under one semantic layer</span></div></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Gemini Enterprise Projects &mdash; scoped memory boundaries</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Creates dedicated memory environments scoped to specific teams, files, and workstreams. An agent serving your sales organization doesn't carry context from your HR processes. Memory governance is how you build trust across business units without creating friction at deployment.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Deep Think &mdash; isolated multi-task reasoning</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Maintains clean reasoning boundaries across parallel workflows, preventing context from one task from contaminating another. When your agents are running financial analysis and customer strategy simultaneously, Deep Think ensures each reasoning chain stays accurate, isolated, and purpose-driven.</p></div></div>
+      </div>
+    </div>
+
+    <!-- L3 -->
+    <div class="lp" id="layer-3">
+      <div class="lm" data-n="3">
+        <div class="l-icon">🔑</div>
+        <h2>What is the agent allowed to do?</h2>
+        <span class="l-tag">Permissions &amp; tool access</span>
+        <p>Access without accountability is exposure. The principle of least privilege &mdash; granting agents only the access they need for the specific task at hand &mdash; is one of the oldest and most reliable rules in enterprise security. It becomes more important, not less, when the actor in question can execute thousands of operations per minute.</p>
+        <p>Permission governance isn't about slowing AI down. It's about giving your organization the confidence to scale it broadly. Leaders deploy AI aggressively when they trust its boundaries. They stall when they don't.</p>
+        <p>Google's <strong>Agent Gateway</strong> serves as the enterprise's unified control point &mdash; a governed passthrough for every agent request before it reaches an external tool, API, or data system. It enforces consistent policies across your entire agent fleet, regardless of how many agents are running or where they're deployed.</p>
+        <div class="why"><div class="why-lb">The leadership principle</div><p>Broad AI deployment requires narrow AI permissions. When your organization knows exactly what its agents can and cannot do, you can build the cross-functional coalition that drives adoption at enterprise scale.</p></div>
+      </div>
+      <div class="l-sidebar">
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Gateway &mdash; unified fleet control</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Every outbound agent action &mdash; email, API call, database query, external service &mdash; routes through the Gateway before execution. Consistent security policies apply across all agents, all environments, and all use cases. One control point. Enterprise-wide enforcement.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Sandbox &mdash; isolated execution environment</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>A hardened, isolated environment for agent code execution with zero exposure to your production systems. Agents can prototype, test, and execute complex workflows without any risk to the systems your business runs on. Now generally available to all customers.</p><div class="ai-stat"><span class="sv">Zero</span><span class="sl">production risk during agent code execution</span></div></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Approved Tool Registry &mdash; governed access library</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Maintains a centralized library of every tool an agent is authorized to use. Agents select from a vetted, enterprise-approved inventory &mdash; not the open internet. This is permission governance operationalized: every tool connection is a deliberate business decision, not an agent-driven improvisation.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Spend Caps &mdash; financial governance controls</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Coming soon: project-level budget ceilings for AI usage that pause API activity automatically when thresholds are reached. Financial governance and operational governance are the same discipline at scale. This is where they converge.</p></div></div>
+      </div>
+    </div>
+
+    <!-- L4 -->
+    <div class="lp" id="layer-4">
+      <div class="lm" data-n="4">
+        <div class="l-icon">🛡️</div>
+        <h2>Is the agent being attacked?</h2>
+        <span class="l-tag">Security &amp; threat detection</span>
+        <p>The attack surface for enterprise AI is fundamentally different from traditional software. Adversaries don't need to breach a firewall &mdash; they can compromise an agent by manipulating the data it reads. A <strong>prompt injection attack</strong> embeds malicious instructions inside content the agent processes, redirecting its behavior without ever touching the underlying system.</p>
+        <p>When agents have the authority to take real actions &mdash; sending communications, modifying records, executing transactions &mdash; a compromised agent isn't a security incident. It's a business operations failure. The security layer must match the scope of the authority being granted.</p>
+        <p>Google's <strong>Model Armor</strong>, integrated with the Wiz security platform, provides inline protection across the full agent lifecycle &mdash; monitoring every input, sanitizing every output, and flagging behavioral anomalies before they propagate into enterprise systems.</p>
+        <div class="why"><div class="why-lb">The $32 billion commitment</div><p>Google's acquisition of Wiz is the largest cybersecurity acquisition in history. That investment signals a clear conviction: in the agentic era, security and governance are not separate disciplines. They are the same one.</p></div>
+      </div>
+      <div class="l-sidebar">
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Model Armor &mdash; inline traffic protection</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Enforces inline sanitization of all agent traffic &mdash; protecting against prompt injection, tool poisoning, and sensitive data leakage &mdash; without requiring any code changes from development teams. Security at the governance layer, not the application layer.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Anomaly Detection &mdash; behavioral intelligence</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Monitors agent reasoning in real time using statistical models and an LLM-as-a-judge framework &mdash; AI auditing AI. Unusual reasoning chains are flagged before they reach execution. This is what proactive AI governance looks like operationally.</p><div class="ai-stat"><span class="sv">Real</span><span class="sl">-time reasoning surveillance and behavioral flagging</span></div></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Threat Hunting Agent &mdash; proactive threat intelligence</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>An autonomous AI agent dedicated to identifying novel attack vectors and stealthy adversary behavior before they breach your defenses. This is the shift from reactive security response to proactive threat alignment &mdash; one of the most significant architectural changes in enterprise cybersecurity in a decade.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Wiz AI-APP Platform &mdash; code-to-cloud protection</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Wiz's AI Application Protection Platform delivers security from code to cloud to runtime across multi-cloud, hybrid, and AI environments. Vulnerabilities in AI-generated code are surfaced at the moment of creation &mdash; before they ever reach a production system. Security aligned at the source.</p></div></div>
+      </div>
+    </div>
+
+    <!-- L5 -->
+    <div class="lp" id="layer-5">
+      <div class="lm" data-n="5">
+        <div class="l-icon">📊</div>
+        <h2>How well is the agent performing?</h2>
+        <span class="l-tag">Oversight, evaluation &amp; optimization</span>
+        <p>Governance without measurement is policy without accountability. The organizations that scale AI successfully are not just the ones that deploy it &mdash; they're the ones that know, with precision, how well it's performing and why. Oversight is what transforms AI from a cost center into a compounding strategic asset.</p>
+        <p>Most enterprises today have no systematic framework for evaluating agent performance. They deploy, they hope, and they react when something breaks. That's not transformation &mdash; it's speculation. The organizations building durable AI advantage are the ones closing the feedback loop.</p>
+        <p>Google's <strong>Agent Evaluation</strong> system scores agents against live production traffic using multi-turn assessment that evaluates complete reasoning chains &mdash; not just isolated responses. The <strong>Agent Optimizer</strong> translates those evaluations into specific, actionable improvements that compounds performance over time.</p>
+        <div class="why"><div class="why-lb">The accountability imperative</div><p>I architect Centers of Excellence that turn potential into performance. Oversight is the layer that makes that possible &mdash; because you cannot improve what you cannot measure, and you cannot scale what you cannot defend.</p></div>
+      </div>
+      <div class="l-sidebar">
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Evaluation &mdash; live performance scoring</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Continuously scores agents against real production traffic using multi-turn autoraters that assess the full logic of an agent's reasoning across a complete conversation &mdash; not just the final output. This is how enterprise leaders move from qualitative impressions to quantitative accountability.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Simulation &mdash; pre-deployment validation</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Tests agents against synthetic, human-like interactions and virtualized tools in a controlled environment before production deployment. Agents are scored on task success and safety across multi-step workflows. This is the proof point you bring to your board before you scale.</p><div class="ai-stat"><span class="sv">Pre</span><span class="sl">-deployment validation, automated and measurable</span></div></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Optimizer &mdash; compounding improvement</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Clusters real-world agent failures and surfaces refined system instructions to improve accuracy over time. The Optimizer is what turns a one-time deployment into a compounding asset &mdash; getting smarter, more aligned, and more valuable with every production cycle.</p></div></div>
+        <div class="ai" onclick="toggleAcc(this)"><div class="ai-hd"><div class="ai-title">Agent Observability &mdash; reasoning transparency</div><div class="ai-tog">+</div></div><div class="ai-bd"><p>Provides a complete visual trace of agent reasoning across complex multi-step tasks. When something goes wrong &mdash; or when leadership needs to understand why something went right &mdash; Observability is the audit trail for AI decision-making. Essential for compliance, trust-building, and executive accountability.</p></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="results-sec" id="results">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">Proof points</span></div>
+    <h2 class="s-head">Governance in production &mdash; what the outcomes say</h2>
+    <p class="s-intro">Theory becomes strategy when it delivers results. These organizations moved past the pilot stage, built governance into their deployments, and produced outcomes that are now redefining performance benchmarks across their industries.</p>
+    <div class="rg fu">
+      <div class="rc"><div class="rco">Deutsche Telekom</div><div class="rn">95%</div><div class="rl">reduction in network event response time</div><div class="rd">Built MINDR &mdash; a multi-agent system that autonomously detects and resolves network failures before customers experience them. This is not AI augmenting a team. It's AI running a mission-critical operation with governance embedded at every layer. ²</div></div>
+      <div class="rc"><div class="rco">Highmark Health</div><div class="rn">$27.9M</div><div class="rl">in documented value delivered in a single year</div><div class="rd">Deployed Sidekick, an AI assistant that automates research and provides intelligent information access across their workforce. The financial figure is audited value &mdash; not projected savings or modeled estimates. That distinction matters. ²</div></div>
+      <div class="rc"><div class="rco">Danfoss</div><div class="rn">~42 hrs</div><div class="rl">&rarr; near real-time order processing</div><div class="rd">Automated 80% of transactional decisions in email-based order processing. A workflow that once required nearly two days now executes in minutes &mdash; with governance controls that escalate anything outside defined parameters to human review. ³</div></div>
+      <div class="rc"><div class="rco">Citadel Securities</div><div class="rn">4&times;</div><div class="rl">faster AI workloads at 30% lower cost</div><div class="rd">Built a TPU-powered research environment on Google Cloud. Analysis that once required days executes in minutes. In financial markets, that compression isn't an efficiency gain &mdash; it's a structural competitive advantage. ²</div></div>
+      <div class="rc"><div class="rco">GE Appliances</div><div class="rn">800+</div><div class="rl">AI agents deployed across live operations</div><div class="rd">Running a governed fleet of specialized agents across manufacturing, logistics, and supply chain. Each agent carries a defined role, verified identity, scoped permissions, and performance oversight. All five layers, in production. ²</div></div>
+      <div class="rc"><div class="rco">Tata Steel</div><div class="rn">300+</div><div class="rl">agents deployed in nine months</div><div class="rd">Scaled from zero to 300 specialized agents in under a year using a low-code deployment platform. The speed was possible because governance was built in from the start &mdash; not retrofitted after the fact. ²</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETE -->
+<section class="compete-sec" id="competition">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">Strategic landscape</span></div>
+    <h2 class="s-head">Five platforms competing to own the agent layer</h2>
+    <p class="s-intro">Understanding the competitive dynamics isn't optional for enterprise leaders making platform decisions today. Each player brings a structurally different position &mdash; and each one carries a structural vulnerability. Here's the honest map.</p>
+    <div class="fu">
+    <table class="ct">
+      <thead><tr><th>Company</th><th>Structural advantage</th><th>Structural risk</th><th>Market position</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pn">Google Cloud</span><span class="pb bg">Full Stack</span><div class="dots"><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d"></div></div></td><td>Controls the full stack from silicon to application &mdash; hardware, models, runtime, and distribution under one architecture. The most defensible long-term position in the field.</td><td>Third in overall cloud market share. Enterprise sales execution must match engineering ambition to convert the platform advantage into market leadership.</td><td>50% year-on-year growth in Q4 2025 &mdash; fastest of the three major cloud providers. ⁴</td></tr>
+        <tr><td><span class="pn">Microsoft</span><span class="pb bm">Distribution</span><div class="dots"><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d"></div></div></td><td>Embedded inside virtually every Fortune 500 organization through Office 365. Copilot has the shortest path to the enterprise desktop of any AI product in the market.</td><td>Deep reliance on OpenAI's models &mdash; a dependency that became a strategic liability when OpenAI's Azure exclusivity ended in April 2026. The distribution moat is real. The model moat is narrowing.</td><td>Copilot deployed across the large enterprise market. Unmatched last-mile distribution advantage globally.</td></tr>
+        <tr><td><span class="pn">AWS / Amazon</span><span class="pb ba">Infrastructure</span><div class="dots"><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d"></div></div></td><td>The largest cloud infrastructure base in the world. The addition of OpenAI's models to Amazon Bedrock on April 28, 2026 is among the most consequential cloud-model partnerships since the launch of ChatGPT. ⁵</td><td>AI model strategy has shifted rapidly from internal development to external partnership. The question is whether infrastructure scale alone is a sufficient moat when your model providers serve your competitors equally.</td><td>AWS represented 18% of Amazon's total revenue and more than half of its operating income in 2025. ⁵</td></tr>
+        <tr><td><span class="pn">OpenAI</span><span class="pb bo">Brand &amp; Models</span><div class="dots"><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d"></div><div class="d"></div></div></td><td>The most recognized AI brand in the world. Enterprise revenue now at 40% of total. Three million weekly active Codex users. Consumer brand gravity that none of the hyperscalers have matched. ⁴</td><td>Trust concerns from the 2023 governance instability remain an active consideration in enterprise procurement. The transition to a fully for-profit structure continues to raise questions among risk-focused buyers in regulated industries.</td><td>Enterprise LLM API spend: approximately 27% in late 2025, down from roughly 50% in 2023. ⁶</td></tr>
+        <tr><td><span class="pn">Anthropic</span><span class="pb ban">Safety &amp; Trust</span><div class="dots"><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d on"></div></div></td><td>The most credible safety positioning in the industry. Model Context Protocol has reached 10,000 servers and 97 million monthly SDK downloads &mdash; establishing MCP as the emerging interoperability standard for agent-to-tool connectivity. ⁴</td><td>Infrastructure scale is a real constraint relative to cloud hyperscalers. Building on top of AWS and Google Cloud infrastructure rather than owning it creates a structural dependency the company continues to navigate.</td><td>Enterprise LLM API spend: approximately 40% in late 2025 &mdash; the largest share of any provider in the market. ⁶</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="tl-sec" id="timeline">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">How we got here</span></div>
+    <h2 class="s-head">The agentic era was years in the making</h2>
+    <p class="s-intro">This didn't happen quickly and it didn't happen by accident. These are the inflection points that built the strategic landscape enterprise leaders are navigating today.</p>
+    <div class="tl">
+      <div class="ti"><div class="td"></div><div class="t-date">2017</div><div class="t-title">Google publishes "Attention is All You Need"</div><div class="t-desc">The research paper that introduced the Transformer architecture &mdash; the engineering foundation underlying every major AI system in production today, including GPT, Gemini, and Claude. Every subsequent AI development traces a direct line back to this contribution.</div></div>
+      <div class="ti"><div class="td"></div><div class="t-date">November 2022</div><div class="t-title">ChatGPT launches &mdash; enterprise AI becomes a board-level conversation</div><div class="t-desc">OpenAI releases ChatGPT, which reaches one million users in five days. For the first time, enterprise leaders experience the capability directly rather than through analyst briefings. The question shifts from "should we explore AI?" to "why haven't we deployed it yet?"</div></div>
+      <div class="ti"><div class="td"></div><div class="t-date">March 2023</div><div class="t-title">GPT-4 integrates tools &mdash; the first true agentic capability</div><div class="t-desc">AI connects to external tools for the first time at scale &mdash; web search, code execution, data retrieval. The shift from language model to agent begins. With it comes the first serious question enterprises haven't yet built answers for: what are we willing to let this do on its own?</div></div>
+      <div class="ti"><div class="td"></div><div class="t-date">November 2024</div><div class="t-title">Anthropic releases the Model Context Protocol (MCP)</div><div class="t-desc">A universal open standard for agent-to-tool connectivity. Later donated to the Linux Foundation's Agentic AI Foundation. Now supporting 10,000 servers and 97 million monthly SDK downloads &mdash; emerging as the interoperability layer that makes multi-vendor agent architectures possible at enterprise scale.</div></div>
+      <div class="ti"><div class="td"></div><div class="t-date">Early 2026</div><div class="t-title">Enterprise AI moves from pilot to production</div><div class="t-desc">For the first time, major enterprises &mdash; Deutsche Telekom, GE Appliances, Tata Steel, Highmark Health, and hundreds of others &mdash; deploy AI agents into live production environments. The experimental phase ends. Governance stops being a future consideration and becomes an immediate operational requirement.</div></div>
+      <div class="ti"><div class="td"></div><div class="t-date">April 22&ndash;25, 2026</div><div class="t-title">Google Cloud Next &rsquo;26 &mdash; 260 announcements define the governed agentic enterprise</div><div class="t-desc">Google presents a unified governance architecture across all five layers: Identity, Memory, Permission, Security, and Oversight &mdash; built on the Gemini Enterprise Agent Platform, 8th-generation TPUs, Wiz's security infrastructure, and a $750 million partner ecosystem. The blueprint for the governed agentic enterprise becomes public. ¹</div></div>
+      <div class="ti"><div class="td"></div><div class="t-date">April 28, 2026</div><div class="t-title">AWS + OpenAI &mdash; the exclusivity era ends, the platform race accelerates</div><div class="t-desc">AWS adds OpenAI's models to Amazon Bedrock the same day OpenAI ends its exclusivity agreement with Microsoft. For enterprise leaders, the signal is clear: the agent platform market is now genuinely competitive. Platform loyalty is a strategic choice, not a default. ⁵</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>AI should be a tool, not a takeover.</h2>
+  <p>The organizations building durable AI advantage aren't the ones running the most agents. They're the ones with the clearest governance, the most aligned teams, and the frameworks to hold both accountable. When leaders are equipped and organizations are united, AI delivers more than growth &mdash; it creates legacy.</p>
+  <a class="cta-btn" href="#governance">Review the 5 layers</a>
+</div>
+
+<!-- CITATIONS -->
+<section class="cite-sec" id="sources">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">Sources and references</span></div>
+    <h2 class="s-head">Where this comes from</h2>
+    <p class="s-intro">Every claim in this report is sourced from primary announcements, official company publications, and independent analyst research. All figures are cited as reported. Click any source to read the original material.</p>
+    <div class="cg fu">
+      <a class="cc" href="https://cloud.google.com/blog/topics/google-cloud-next/google-cloud-next-2026-wrap-up" target="_blank" rel="noopener"><div class="cn">¹</div><div class="cc-c"><div class="cc-t">Google Cloud Next &rsquo;26 &mdash; 260-announcement wrap-up</div><div class="cc-m">Google Cloud Blog &middot; April 25, 2026</div></div><div class="cc-a">&rarr;</div></a>
+      <a class="cc" href="https://cloud.google.com/blog/topics/google-cloud-next/next26-day-1-recap" target="_blank" rel="noopener"><div class="cn">²</div><div class="cc-c"><div class="cc-t">Day 1 keynote recap &mdash; customer case studies and platform announcements</div><div class="cc-m">Google Cloud Blog &middot; April 23, 2026</div></div><div class="cc-a">&rarr;</div></a>
+      <a class="cc" href="https://thenextweb.com/news/google-cloud-next-ai-agents-agentic-era" target="_blank" rel="noopener"><div class="cn">³</div><div class="cc-c"><div class="cc-t">Google Cloud Next 2026 &mdash; full-stack competitive analysis, includes Danfoss case study</div><div class="cc-m">The Next Web &middot; April 2026</div></div><div class="cc-a">&rarr;</div></a>
+      <a class="cc" href="https://cloud.google.com/blog/topics/google-cloud-next/welcome-to-google-cloud-next26" target="_blank" rel="noopener"><div class="cn">⁴</div><div class="cc-c"><div class="cc-t">Google Cloud Next &rsquo;26 &mdash; Thomas Kurian opening keynote</div><div class="cc-m">Google Cloud Blog &middot; April 22, 2026</div></div><div class="cc-a">&rarr;</div></a>
+      <a class="cc" href="https://siliconangle.com/2026/04/28/aws-brings-openais-ai-models-codex-programming-assistant-cloud/" target="_blank" rel="noopener"><div class="cn">⁵</div><div class="cc-c"><div class="cc-t">AWS brings OpenAI models and Codex to Amazon Bedrock</div><div class="cc-m">SiliconANGLE &middot; April 28, 2026</div></div><div class="cc-a">&rarr;</div></a>
+      <a class="cc" href="https://www.kai-waehner.de/blog/2026/04/06/enterprise-agentic-ai-landscape-2026-trust-flexibility-and-vendor-lock-in/" target="_blank" rel="noopener"><div class="cn">⁶</div><div class="cc-c"><div class="cc-t">Enterprise agentic AI landscape 2026 &mdash; trust, flexibility, and vendor lock-in</div><div class="cc-m">Kai Waehner, Independent Analysis &middot; April 6, 2026 &mdash; includes Menlo Ventures market share data</div></div><div class="cc-a">&rarr;</div></a>
+      <a class="cc" href="https://blog.google/innovation-and-ai/infrastructure-and-cloud/google-cloud/cloud-next-2026-sundar-pichai/" target="_blank" rel="noopener"><div class="cn">⁷</div><div class="cc-c"><div class="cc-t">Sundar Pichai on Google&rsquo;s $185B capital expenditure and cloud strategy</div><div class="cc-m">Google Blog &middot; April 22, 2026</div></div><div class="cc-a">&rarr;</div></a>
+      <a class="cc" href="https://marqstats.com/reports/agentic-ai-platform-market/" target="_blank" rel="noopener"><div class="cn">⁸</div><div class="cc-c"><div class="cc-t">Agentic AI platform market forecast 2026&ndash;2030 &mdash; includes Gartner projection data</div><div class="cc-m">MarqStats Research &middot; March&ndash;April 2026</div></div><div class="cc-a">&rarr;</div></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fi">
+    <p>&copy; 2026 Alex S. Moy. All rights reserved.</p>
+    <p class="fb">Alex S. Moy &mdash; Architect of AI Alignment</p>
+    <p>Based on Google Cloud Next &rsquo;26 &middot; 260 announcements &middot; Las Vegas</p>
+  </div>
+</footer>
+
+<script>
+function showLayer(n){
+  document.querySelectorAll('.lp').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach((b,i)=>{b.classList.toggle('active',i===n-1);b.setAttribute('aria-selected',i===n-1?'true':'false');});
+  document.getElementById('layer-'+n).classList.add('active');
+}
+function toggleAcc(el){
+  const panel=el.closest('.lp');
+  panel.querySelectorAll('.ai').forEach(a=>{if(a!==el)a.classList.remove('open');});
+  el.classList.toggle('open');
+}
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.1});
+document.querySelectorAll('.fu,.ti').forEach((el,i)=>{
+  if(el.classList.contains('ti'))el.style.transitionDelay=(i*0.07)+'s';
+  io.observe(el);
+});
+const navAs=document.querySelectorAll('.nav-links a');
+const secs=[...document.querySelectorAll('section[id]')];
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY+80;let cur='';
+  secs.forEach(s=>{if(s.offsetTop<=y)cur=s.id;});
+  navAs.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+},{passive:true});
+</script>
+</body>
+</html>
