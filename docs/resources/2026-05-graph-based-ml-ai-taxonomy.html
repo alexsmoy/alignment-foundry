@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph-Based ML &amp; AI Taxonomy — The Evolutionary Lineage · Alex S. Moy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep-blue:#0A2342;--deep-aqua:#14786C;--charcoal:#1C1C1E;
+  --aquamarine:#67FCF1;--light-teal:#96E5AC;--white:#FFFFFF;
+  --gradient:linear-gradient(135deg,#0A2342 0%,#14786C 55%,#67FCF1 100%);
+  --w90:rgba(255,255,255,.90);--w60:rgba(255,255,255,.60);
+  --w30:rgba(255,255,255,.30);--w10:rgba(255,255,255,.10);
+  --w06:rgba(255,255,255,.06);
+  --aq20:rgba(103,252,241,.20);--aq10:rgba(103,252,241,.10);--aq06:rgba(103,252,241,.06);
+  --font:'Hanken Grotesk',system-ui,sans-serif;
+  --sec:96px;--maxw:1200px;--gutter:48px;
+  /* Family accents (brand-aligned palette) */
+  --fam-spectral:#67FCF1;
+  --fam-spatial:#96E5AC;
+  --fam-attention:#A5B8FF;
+  --fam-generative:#FFB6C7;
+  --fam-probabilistic:#9FE7DC;
+  --fam-scalable:#F5D58A;
+  --fam-geometric:#67FCF1;
+  --fam-foundation:#C9A8FF;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--deep-blue);color:var(--white);font-family:var(--font);font-size:17px;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--deep-blue)}::-webkit-scrollbar-thumb{background:var(--aquamarine)}
+.inner{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,35,66,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--w10)}
+.nav-inner{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter);height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-weight:700;font-size:15px;color:var(--white);letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--aquamarine)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{font-size:13px;font-weight:500;color:var(--w60);text-decoration:none;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--aquamarine)}
+
+/* HERO */
+.hero{min-height:100vh;background:var(--deep-blue);display:flex;flex-direction:column;justify-content:flex-end;padding-top:64px;overflow:hidden;position:relative}
+.hero-backdrop{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 80% 20%,rgba(20,120,108,.35) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 10% 70%,rgba(103,252,241,.08) 0%,transparent 55%),var(--deep-blue);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(103,252,241,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(103,252,241,.04) 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(to bottom,transparent,rgba(0,0,0,.4) 30%,rgba(0,0,0,.4) 70%,transparent);pointer-events:none}
+.hero-content{position:relative;z-index:2;padding:var(--sec) var(--gutter) 80px;max-width:var(--maxw);margin:0 auto;width:100%}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.ey-line{width:32px;height:2px;background:var(--aquamarine)}
+.ey-text{font-size:13px;font-weight:500;color:var(--aquamarine);letter-spacing:.06em}
+.hero h1{font-size:clamp(40px,6.5vw,80px);font-weight:700;line-height:1.05;letter-spacing:-.025em;color:var(--white);max-width:880px;margin-bottom:28px}
+.hero h1 .aq{color:var(--aquamarine)}
+.hero-sub{font-size:19px;font-weight:400;color:var(--w90);line-height:1.65;max-width:640px;margin-bottom:52px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--w10);padding-top:32px}
+.hm-item{padding:0 40px 0 0}
+.hm-label{font-size:11px;font-weight:500;color:var(--w60);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.hm-value{font-size:14px;font-weight:700;color:var(--white)}
+.hm-value.aq{color:var(--aquamarine)}
+
+/* SECTION LABELS */
+.s-eye{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.s-eye .ln{width:28px;height:2px;background:var(--aquamarine)}
+.s-eye .lb{font-size:12px;font-weight:500;color:var(--aquamarine);letter-spacing:.08em;text-transform:uppercase}
+.s-head{font-size:clamp(28px,3.5vw,44px);font-weight:700;line-height:1.15;letter-spacing:-.02em;color:var(--white);margin-bottom:16px}
+.s-head .aq{color:var(--aquamarine)}
+.s-intro{font-size:17px;font-weight:400;color:var(--w90);max-width:680px;line-height:1.7;margin-bottom:60px}
+
+/* INTRO */
+.intro-sec{padding:var(--sec) 0;background:var(--deep-blue);border-top:1px solid var(--w10)}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:60px}
+.ic{background:var(--w06);border:1px solid var(--w10);padding:36px 32px;position:relative;transition:background .25s}
+.ic:hover{background:var(--w10)}
+.ic::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--deep-aqua);transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.ic:hover::before{transform:scaleX(1)}
+.ic-num{font-size:11px;font-weight:700;color:var(--deep-aqua);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.ic h3{font-size:17px;font-weight:700;color:var(--white);margin-bottom:12px;line-height:1.3}
+.ic p{font-size:15px;font-weight:400;color:var(--w90);line-height:1.65}
+
+/* LEGEND */
+.legend-sec{padding:48px 0;background:var(--charcoal);border-top:1px solid var(--w10);border-bottom:1px solid var(--w10)}
+.legend{display:flex;flex-wrap:wrap;gap:20px 32px;justify-content:center;align-items:center}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:500;color:var(--w90);letter-spacing:.02em}
+.legend-dot{width:10px;height:10px;border-radius:2px}
+
+/* TIMELINE */
+.tl-sec{padding:var(--sec) 0;background:var(--deep-blue);position:relative}
+.tl-container{position:relative;max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+.tl-spine{position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,var(--aquamarine) 4%,var(--deep-aqua) 50%,var(--aquamarine) 96%,transparent);transform:translateX(-50%);z-index:1}
+.era-label{position:relative;text-align:center;margin:40px 0 28px;z-index:3}
+.era-label span{background:var(--deep-blue);padding:8px 22px;border:1px solid var(--w10);border-radius:24px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--w90);font-weight:700}
+.era-label span::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--aquamarine);margin-right:10px;vertical-align:middle;transform:translateY(-1px)}
+.cards-row{display:flex;gap:32px;margin:14px 0;align-items:flex-start;position:relative}
+.cards-row.left{flex-direction:row}
+.cards-row.right{flex-direction:row-reverse}
+.card-spacer{flex:1;min-width:0}
+.gcard{flex:1;min-width:0;background:var(--w06);border:1px solid var(--w10);padding:24px 26px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden;opacity:0;transform:translateY(14px)}
+.gcard.visible{opacity:1;transform:translateY(0)}
+.gcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,var(--aquamarine));opacity:.85;transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.gcard:hover::before,.gcard.expanded::before{transform:scaleX(1)}
+.gcard:hover{background:var(--w10);border-color:var(--card-accent,var(--aquamarine));transform:translateY(-2px)}
+.gcard.expanded{border-color:var(--card-accent,var(--aquamarine));background:var(--w10)}
+.gcard-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.gcard-year{font-size:11px;font-weight:700;color:var(--card-accent,var(--aquamarine));letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.gcard-title{font-family:var(--font);font-weight:700;font-size:18px;line-height:1.25;letter-spacing:-.01em;color:var(--white)}
+.gcard-abbr{font-size:12px;font-weight:500;color:var(--card-accent,var(--aquamarine));margin-top:4px}
+.gcard-desc{font-size:14px;color:var(--w90);line-height:1.65;margin-top:10px}
+.gcard-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.gtag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:2px;border:1px solid;color:var(--w60);border-color:var(--w10)}
+.gtag.primary{color:var(--card-accent,var(--aquamarine));border-color:var(--card-accent,var(--aquamarine));background:rgba(255,255,255,.03)}
+.gcard-details{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.gcard.expanded .gcard-details{max-height:800px}
+.gcard-details-inner{padding-top:18px;border-top:1px solid var(--w10);margin-top:18px}
+.detail-section{margin-bottom:16px}
+.detail-section:last-child{margin-bottom:0}
+.detail-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--card-accent,var(--aquamarine));margin-bottom:8px}
+.detail-text{font-size:14px;color:var(--w90);line-height:1.7}
+.use-case-list{list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0}
+.use-case-list li{font-size:12px;color:var(--white);background:rgba(255,255,255,.05);border:1px solid var(--w10);padding:5px 10px;border-radius:2px}
+.connector{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--card-accent,var(--aquamarine));box-shadow:0 0 14px var(--card-accent,var(--aquamarine));z-index:2;border:2px solid var(--deep-blue)}
+
+/* FAMILY GRID */
+.family-sec{padding:var(--sec) 0;background:var(--charcoal);border-top:1px solid var(--w10);border-bottom:1px solid var(--w10)}
+.family-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px}
+.family-card{background:var(--w06);border:1px solid var(--w10);padding:28px 26px;position:relative;transition:background .25s}
+.family-card:hover{background:var(--w10)}
+.family-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--f-color,var(--aquamarine))}
+.family-title{font-size:14px;font-weight:700;color:var(--f-color,var(--aquamarine));letter-spacing:.04em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.family-title::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--f-color,var(--aquamarine))}
+.family-members{display:flex;flex-wrap:wrap;gap:6px}
+.family-member{font-size:12px;font-weight:500;padding:5px 10px;border-radius:2px;background:rgba(255,255,255,.05);border:1px solid var(--w10);color:var(--white)}
+
+/* CTA */
+.cta{padding:80px var(--gutter);background:var(--gradient);text-align:center}
+.cta h2{font-size:clamp(24px,3.5vw,40px);font-weight:700;color:var(--white);letter-spacing:-.02em;margin-bottom:16px}
+.cta p{font-size:17px;font-weight:400;color:rgba(255,255,255,.88);max-width:620px;margin:0 auto 36px;line-height:1.7}
+.cta-btn{display:inline-block;background:var(--aquamarine);color:var(--deep-blue);font-family:var(--font);font-size:16px;font-weight:700;padding:16px 40px;border-radius:4px;text-decoration:none;letter-spacing:.02em;transition:background .2s}
+.cta-btn:hover{background:#ffffff}
+
+/* FOOTER */
+footer{padding:36px var(--gutter);background:var(--deep-blue);border-top:1px solid var(--w10)}
+.fi{max-width:var(--maxw);margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+footer p{font-size:13px;font-weight:400;color:var(--w60)}
+.fb{font-size:13px;font-weight:700;color:var(--aquamarine)}
+
+/* FADE-UP */
+.fu{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+.fu.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  :root{--gutter:24px;--sec:64px}
+  .three-col{grid-template-columns:1fr}
+  .tl-spine,.connector{display:none}
+  .cards-row{flex-direction:column !important}
+  .card-spacer{display:none}
+  .nav-links{display:none}
+  .hero h1{font-size:clamp(36px,8vw,56px)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand"><div class="nav-dot"></div>Alex S. Moy &mdash; Field Reference</div>
+    <ul class="nav-links">
+      <li><a href="#why">Why this matters</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#families">Families</a></li>
+      <li><a href="#index">All resources</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-backdrop"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="ey-line"></div>
+      <span class="ey-text">Field Reference &nbsp;&middot;&nbsp; AI Architectures &nbsp;&middot;&nbsp; 1988&ndash;2024</span>
+    </div>
+    <h1>Graph-based ML<br>&amp; AI <span class="aq">taxonomy.</span></h1>
+    <p class="hero-sub">From early probabilistic graphical models to modern graph foundation models &mdash; the full evolutionary lineage of how machines learn to reason over structured relationships. Click any card to expand.</p>
+    <div class="hero-meta">
+      <div class="hm-item"><div class="hm-label">Coverage</div><div class="hm-value aq">7 eras &middot; 22 architectures</div></div>
+      <div class="hm-item"><div class="hm-label">Format</div><div class="hm-value">Interactive timeline</div></div>
+      <div class="hm-item"><div class="hm-label">Published</div><div class="hm-value">May 2026</div></div>
+      <div class="hm-item"><div class="hm-label">Author</div><div class="hm-value">Alex S. Moy</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="intro-sec" id="why">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">Why a graph view of ML matters</span></div>
+    <h2 class="s-head">Most enterprise data is <span class="aq">already a graph.</span></h2>
+    <p class="s-intro">Customers, transactions, suppliers, molecules, networks, knowledge bases &mdash; the value isn't in any single record, it's in the relationships between them. Understanding the lineage of graph-based ML is how enterprise leaders decide which architectures to invest in, which vendors to trust, and where the next wave of AI capability is heading.</p>
+    <div class="three-col fu">
+      <div class="ic">
+        <div class="ic-num">Lens 01</div>
+        <h3>A map of architectural lineage</h3>
+        <p>Every modern graph model traces back to a small set of foundational ideas. Seeing the lineage clarifies which approaches are mature, which are still experimental, and which are converging into tomorrow's foundation models.</p>
+      </div>
+      <div class="ic">
+        <div class="ic-num">Lens 02</div>
+        <h3>The bridge to LLMs</h3>
+        <p>Knowledge graphs, GraphRAG, and graph foundation models are the connective tissue between structured enterprise data and large language models. They are how LLMs become trustworthy, grounded, and auditable.</p>
+      </div>
+      <div class="ic">
+        <div class="ic-num">Lens 03</div>
+        <h3>A vocabulary for governance</h3>
+        <p>Conversations about agent governance, drug discovery, fraud detection, and protein design all rely on this vocabulary. This reference exists so leaders can read the room when their teams say &ldquo;GNN,&rdquo; &ldquo;MPNN,&rdquo; or &ldquo;Evoformer.&rdquo;</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEGEND -->
+<section class="legend-sec">
+  <div class="inner">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fam-spectral)"></div>Spectral / Convolutional</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fam-spatial)"></div>Spatial / Message Passing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fam-attention)"></div>Attention / Transformer</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fam-generative)"></div>Generative</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fam-probabilistic)"></div>Probabilistic / Classical</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fam-scalable)"></div>Scalable / Sampling</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fam-foundation)"></div>Foundation / LLM</div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="tl-sec" id="timeline">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">The evolutionary lineage</span></div>
+    <h2 class="s-head">Seven eras of graph-based AI</h2>
+    <p class="s-intro">Each card is a key architecture or paradigm. Click to reveal its innovation, real-world uses, and limitations. The spine marks the chronological backbone &mdash; the eras above it group related advances.</p>
+  </div>
+  <div class="tl-container">
+    <div class="tl-spine"></div>
+
+    <!-- ERA 1 -->
+    <div class="era-label"><span>Era I &middot; Classical Foundations &middot; 1980s&ndash;2000s</span></div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-probabilistic)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">~1988</div>
+            <div class="gcard-title">Bayesian Networks</div>
+            <div class="gcard-abbr">BN &middot; DAG Models</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Directed acyclic graphs encoding probabilistic conditional dependencies between variables. Pearl's foundational framework for reasoning under uncertainty.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Probabilistic</span>
+          <span class="gtag">Directed</span>
+          <span class="gtag">Inference</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Compact representation of joint probability distributions via conditional independence. Enables exact and approximate Bayesian inference (belief propagation, junction trees).</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Medical diagnosis</li><li>Fault detection</li><li>Spam filtering</li><li>Risk analysis</li><li>Gene regulatory networks</li></ul></div>
+          <div class="detail-section"><div class="detail-label">Limitation</div><div class="detail-text">Exponential complexity in dense graphs; requires expert-defined structure or structure learning from data.</div></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-probabilistic)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">~1994</div>
+            <div class="gcard-title">Markov Random Fields</div>
+            <div class="gcard-abbr">MRF &middot; Undirected GM</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Undirected graphical models capturing symmetric dependencies. Boltzmann machines are a neural instance. Widely used in computer vision for structured prediction.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Probabilistic</span>
+          <span class="gtag">Undirected</span>
+          <span class="gtag">Energy-Based</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Gibbs distributions allow modeling spatial/temporal correlations without causal direction. Loopy belief propagation enables approximate inference.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Image segmentation</li><li>Stereo vision</li><li>Denoising</li><li>Social network analysis</li><li>NLP tagging</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-probabilistic)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">~1998</div>
+            <div class="gcard-title">Kernel Methods on Graphs</div>
+            <div class="gcard-abbr">Graph Kernels</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Measure graph similarity by counting shared substructures &mdash; walks, paths, subtrees, Weisfeiler&ndash;Lehman patterns. Plugged into SVMs for graph classification.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Classical ML</span>
+          <span class="gtag">Graph Classification</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">The WL kernel (2011) became the gold standard, later inspiring the theoretical understanding of GNN expressiveness via WL graph isomorphism tests.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Molecule classification</li><li>Protein function prediction</li><li>Malware detection</li><li>Social network classification</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <!-- ERA 2 -->
+    <div class="era-label"><span>Era II &middot; Deep Graph Learning Emerges &middot; 2013&ndash;2017</span></div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-scalable)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2013 &ndash; 2014</div>
+            <div class="gcard-title">DeepWalk / Node2Vec</div>
+            <div class="gcard-abbr">Random-Walk Embeddings</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Apply Word2Vec&ndash;style skip-gram to random walk sequences on graphs. Node2Vec adds biased walks (BFS/DFS) for flexible neighborhood exploration.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Scalable</span>
+          <span class="gtag">Transductive</span>
+          <span class="gtag">Embeddings</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">First scalable approach to learn continuous node representations. Inspired LINE (2015) and a wave of network embedding methods (SDNE, HOPE).</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Link prediction</li><li>Community detection</li><li>Recommender systems</li><li>Knowledge graph completion</li></ul></div>
+          <div class="detail-section"><div class="detail-label">Limitation</div><div class="detail-text">Transductive (can't generalize to unseen nodes without retraining). No feature aggregation.</div></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-spectral)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2014</div>
+            <div class="gcard-title">Spectral Graph CNN</div>
+            <div class="gcard-abbr">Spectral GCN (Bruna et al.)</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Defines convolution in the graph Fourier domain via eigendecomposition of the graph Laplacian. Theoretically sound but expensive at scale.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Spectral</span>
+          <span class="gtag">Convolution</span>
+          <span class="gtag">Foundational</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Bridged signal processing on graphs with deep learning. Defined the theoretical foundation for all spectral GNNs. ChebNet (2016) made it practical with polynomial approximations.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Node classification</li><li>Graph classification</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-spectral)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2017</div>
+            <div class="gcard-title">Graph Convolutional Network</div>
+            <div class="gcard-abbr">GCN (Kipf &amp; Welling)</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Simplifies spectral convolution to a first-order Chebyshev approximation. Each node aggregates a normalized mean of its neighbors' features. Seminal paper with 20,000+ citations.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Spectral</span>
+          <span class="gtag">Semi-Supervised</span>
+          <span class="gtag">Node Classification</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Layer-wise propagation rule with the renormalization trick. Practical, fast, effective on citation networks. Became the baseline for the entire field.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Citation network classification</li><li>Knowledge graph reasoning</li><li>Drug discovery</li><li>Traffic prediction</li></ul></div>
+          <div class="detail-section"><div class="detail-label">Limitation</div><div class="detail-text">Fixed graph at training (transductive). Deep stacking dilutes features (over-smoothing). Uniform neighbor weighting.</div></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <!-- ERA 3 -->
+    <div class="era-label"><span>Era III &middot; Spatial &amp; Message-Passing Paradigm &middot; 2017&ndash;2019</span></div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-spatial)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2017</div>
+            <div class="gcard-title">Message Passing Neural Net</div>
+            <div class="gcard-abbr">MPNN (Gilmer et al.)</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Unifying framework: nodes pass messages to neighbors, aggregate, and update their own state. Most spatial GNNs are special cases of MPNN. Origin paper from Google Brain on molecular property prediction.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Spatial</span>
+          <span class="gtag">Unifying Framework</span>
+          <span class="gtag">Chemistry</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Message function M, aggregation &Sigma;, and update function U define a complete GNN paradigm. Enabled systematic comparison and design of new architectures.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Quantum chemistry (QM9 benchmark)</li><li>Molecular property prediction</li><li>Drug&ndash;target interaction</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-attention)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2017</div>
+            <div class="gcard-title">Graph Attention Network</div>
+            <div class="gcard-abbr">GAT (Veli&ccaron;kovi&cacute; et al.)</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Introduces learnable attention coefficients for neighbor aggregation. Nodes attend differentially to neighbors &mdash; resolving GCN's uniform-weighting problem.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Attention</span>
+          <span class="gtag">Inductive</span>
+          <span class="gtag">Multi-head</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Multi-head attention on graph neighborhoods. No eigendecomposition required. GAT v2 (2022) fixes expressiveness issues where attention collapsed in the original formulation.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Social network analysis</li><li>Protein interface prediction</li><li>NLP dependency parsing</li><li>Recommendation</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-scalable)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2017</div>
+            <div class="gcard-title">GraphSAGE</div>
+            <div class="gcard-abbr">SAmple &amp; aggreGatE</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Inductive learning by sampling fixed-size neighborhoods and aggregating (mean / max / LSTM). First GNN to scale to massive graphs via mini-batch training.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Scalable</span>
+          <span class="gtag">Inductive</span>
+          <span class="gtag">Sampling</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Mini-batch training on subgraphs via neighborhood sampling. Enables deployment on billion-node graphs (PinSage used it at Pinterest scale).</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Pinterest recommendations (PinSage)</li><li>E-commerce graphs</li><li>Fraud detection at scale</li><li>Citation networks</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-spatial)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2019</div>
+            <div class="gcard-title">Graph Isomorphism Network</div>
+            <div class="gcard-abbr">GIN (Xu et al.)</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Theoretically proves GNNs are at most as powerful as the Weisfeiler&ndash;Lehman graph isomorphism test. GIN achieves this upper bound using injective aggregation (sum + MLP) &mdash; the most expressive standard MPNN.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Spatial</span>
+          <span class="gtag">Theory</span>
+          <span class="gtag">Expressiveness</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Formal characterization of GNN power. Showed mean/max aggregation is strictly weaker than sum. Opened research into higher-order GNNs (k-WL, NGNN) that go beyond WL.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Graph classification benchmarks</li><li>Molecular property prediction</li><li>Combinatorial optimization</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <!-- ERA 4 -->
+    <div class="era-label"><span>Era IV &middot; Generative &amp; Knowledge Graph Models &middot; 2018&ndash;2020</span></div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-generative)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2018</div>
+            <div class="gcard-title">Graph Variational Autoencoder</div>
+            <div class="gcard-abbr">GVAE / VGAE</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Combines a GCN encoder with an inner-product decoder in a VAE framework. Learns latent representations of graph structure for generation and link prediction.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Generative</span>
+          <span class="gtag">Latent Space</span>
+          <span class="gtag">Unsupervised</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">First principled probabilistic generative model for graphs. Extended to conditional CVAE for molecule generation (JT-VAE with junction-tree decoder).</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>De novo drug design</li><li>Link prediction</li><li>Network completion</li><li>Molecule generation</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-probabilistic)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2018 &ndash; 2019</div>
+            <div class="gcard-title">Knowledge Graph Embeddings</div>
+            <div class="gcard-abbr">TransE / RotatE / ComplEx</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Learn entity and relation embeddings in continuous space. TransE models relations as translations; RotatE uses rotation in complex space; ComplEx handles symmetric/antisymmetric relations.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Knowledge Graphs</span>
+          <span class="gtag">Link Prediction</span>
+          <span class="gtag">Reasoning</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Score function h+r&asymp;t (TransE). Later models &mdash; RGCN, CompGCN, NBFNet &mdash; add neural power. Foundation for KGQA and multi-hop reasoning.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Freebase / Wikidata completion</li><li>Question answering over KGs</li><li>Biomedical KG (DRKG)</li><li>Recommender systems</li><li>Entity alignment</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-generative)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2018</div>
+            <div class="gcard-title">MolGAN / CGVAE</div>
+            <div class="gcard-abbr">Graph GAN &middot; CGVAE</div>
+          </div>
+        </div>
+        <div class="gcard-desc">MolGAN uses GAN + RL reward for direct molecule generation. CGVAE conditions on valid chemistry constraints. Both produce molecular graphs directly as adjacency/feature matrices.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Generative</span>
+          <span class="gtag">Drug Discovery</span>
+          <span class="gtag">GAN</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">RL reward shaping for chemical validity and QED drug-likeness. Opened the field of deep generative chemistry. Later superseded by flow-based and diffusion models.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>De novo drug design</li><li>Material discovery</li><li>Molecular optimization</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <!-- ERA 5 -->
+    <div class="era-label"><span>Era V &middot; Scaling, Transformers &amp; Heterogeneous Graphs &middot; 2019&ndash;2022</span></div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-attention)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2019</div>
+            <div class="gcard-title">Heterogeneous GNN</div>
+            <div class="gcard-abbr">HAN / HGT / RSAGE</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Extend GNNs to graphs with multiple node and edge types. HAN uses type-level attention; HGT uses Transformer-style attention with per-type projection matrices.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Heterogeneous</span>
+          <span class="gtag">Multi-relational</span>
+          <span class="gtag">Attention</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Meta-path attention (HAN) and type-specific transformations (HGT). Essential for real-world graphs with semantic edge types (user&ndash;item&ndash;category, gene&ndash;disease&ndash;drug).</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>E-commerce recommendation</li><li>Academic graph analysis</li><li>Biomedical networks</li><li>Financial fraud detection</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-scalable)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2019 &ndash; 2020</div>
+            <div class="gcard-title">Scalable GNN Training</div>
+            <div class="gcard-abbr">ClusterGCN / GraphSAINT / SIGN</div>
+          </div>
+        </div>
+        <div class="gcard-desc">ClusterGCN partitions graphs into clusters for mini-batches. GraphSAINT samples subgraphs with importance weighting. SIGN precomputes graph operators without sampling.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Scalable</span>
+          <span class="gtag">Industrial</span>
+          <span class="gtag">Mini-batch</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Enabled GNN training on ogbn-papers100M (100M nodes, 1B edges). These techniques power production GNNs at Google, Meta, Alibaba, and X.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Web-scale recommendation</li><li>Large-scale fraud detection</li><li>Billion-node social graphs</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-attention)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2020 &ndash; 2021</div>
+            <div class="gcard-title">Graph Transformer</div>
+            <div class="gcard-abbr">GT / Graphormer / SAN</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Apply full Transformer self-attention to graph nodes, encoding structure via positional encodings (Laplacian eigenvectors, random walk scores, shortest-path distances).</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Attention</span>
+          <span class="gtag">Transformer</span>
+          <span class="gtag">Long-range</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Graphormer won OGB-LSC (2021) molecular challenge. Overcomes over-squashing by allowing any-to-any attention. GPS (General, Powerful, Scalable) unifies MPNN + attention.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Molecular property prediction</li><li>Quantum chemistry</li><li>Traffic forecasting</li><li>Code analysis</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-generative)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2021 &ndash; 2022</div>
+            <div class="gcard-title">Graph Diffusion Models</div>
+            <div class="gcard-abbr">GDSS / DiGress / DiffSBDD</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Apply score-based diffusion (DDPM/DDIM) to graphs. Jointly diffuse node features and adjacency. DiffSBDD targets structure-based drug design in 3D protein pockets.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Generative</span>
+          <span class="gtag">Diffusion</span>
+          <span class="gtag">3D Molecular</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">State-of-the-art molecular generation quality. GEOM-Drug benchmark dominance. DiGress uses discrete diffusion on graph tokens. EquiDiff and Torsional Diffusion add 3D equivariance.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Structure-based drug design</li><li>Protein&ndash;ligand docking</li><li>Material generation</li><li>Molecule optimization</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <!-- ERA 6 -->
+    <div class="era-label"><span>Era VI &middot; Physics, Biology &amp; Geometric GNNs &middot; 2020&ndash;2023</span></div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-spectral)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2021</div>
+            <div class="gcard-title">Equivariant GNNs</div>
+            <div class="gcard-abbr">EGNN / SE(3)-Trans / NequIP</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Enforce equivariance to 3D rotations and translations (SE(3) / E(3) symmetry). Node features transform as geometric tensors &mdash; essential for molecular and physical simulations.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Geometric</span>
+          <span class="gtag">Physics</span>
+          <span class="gtag">Equivariant</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">NequIP outperforms force fields with 1000&times; less data. MACE (2022) uses higher-body-order equivariant features. Foundational for universal ML potentials (MACE-MP-0).</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Molecular dynamics simulation</li><li>Protein structure prediction</li><li>Crystal property prediction</li><li>Quantum chemistry</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-spectral)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2021 &ndash; 2022</div>
+            <div class="gcard-title">AlphaFold 2 &mdash; Evoformer</div>
+            <div class="gcard-abbr">Evoformer (DeepMind)</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Evoformer treats the amino acid distance map as a graph. Axial attention on pairwise edges + MSA rows. The most impactful applied GNN to date &mdash; predicted ~200M protein structures.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Structural Biology</span>
+          <span class="gtag">Attention</span>
+          <span class="gtag">Landmark</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Triangular multiplicative updates on pair representations enforce geometric consistency. Iterative recycling. AlphaFold 3 extends to nucleic acids and small molecules using a diffusion head.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Protein structure prediction</li><li>Drug target discovery</li><li>Enzyme engineering</li><li>Antibody design</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-spatial)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2022</div>
+            <div class="gcard-title">Temporal &amp; Dynamic GNNs</div>
+            <div class="gcard-abbr">TGN / JODIE / DyRep</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Model evolving graphs with time-stamped edges. TGN maintains per-node memory updated by temporal attention over interaction history. Essential for streaming graph data.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Temporal</span>
+          <span class="gtag">Streaming</span>
+          <span class="gtag">Dynamic</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Continuous-time dynamic graph processing. Memory module + graph attention enables future link prediction and event-time prediction. Used in real-time fraud detection on transaction graphs.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Real-time fraud detection</li><li>User behavior modeling</li><li>Temporal knowledge graphs</li><li>Financial transaction networks</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <!-- ERA 7 -->
+    <div class="era-label"><span>Era VII &middot; Graph Foundation Models &amp; LLM Integration &middot; 2023&ndash;Present</span></div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-foundation)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2023 &ndash; 2024</div>
+            <div class="gcard-title">Graph Foundation Models</div>
+            <div class="gcard-abbr">OFA / PRODIGY / GraphFM</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Pre-train a single GNN on diverse graph datasets for zero / few-shot transfer. OFA (One For All) uses text-attributed graphs; PRODIGY uses in-context learning on graphs.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Foundation Model</span>
+          <span class="gtag">Transfer Learning</span>
+          <span class="gtag">Zero-shot</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Cross-domain pre-training on heterogeneous graph types. Prompted with task descriptions (text). Bridges the &ldquo;no universal graph vocabulary&rdquo; challenge that prevented GPT-style scaling for graphs.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Few-shot node classification</li><li>Cross-dataset transfer</li><li>Multi-task graph learning</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row right">
+      <div class="gcard fu" style="--card-accent:var(--fam-foundation)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2023 &ndash; 2024</div>
+            <div class="gcard-title">LLM + Graph RAG</div>
+            <div class="gcard-abbr">GraphRAG / G-Retriever</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Augment LLM reasoning with structured knowledge-graph retrieval. GraphRAG (Microsoft) builds community summaries from KGs for global QA. G-Retriever uses a GNN for subgraph retrieval.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">LLM + Graph</span>
+          <span class="gtag">RAG</span>
+          <span class="gtag">Knowledge</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">Knowledge graphs provide structured, verifiable context to LLMs &mdash; reducing hallucination. GraphRAG enables multi-hop reasoning impossible with flat vector RAG. Widely used in enterprise AI.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Enterprise knowledge QA</li><li>Multi-hop reasoning</li><li>KGQA (Freebase, Wikidata)</li><li>Medical literature analysis</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+    <div class="cards-row left">
+      <div class="gcard fu" style="--card-accent:var(--fam-probabilistic)" onclick="toggle(this)">
+        <div class="connector"></div>
+        <div class="gcard-header">
+          <div>
+            <div class="gcard-year">2024</div>
+            <div class="gcard-title">Graph Neural Diffusion / PDE-GNN</div>
+            <div class="gcard-abbr">GRAND / GraphBelief</div>
+          </div>
+        </div>
+        <div class="gcard-desc">Reframe GNN propagation as discretizing continuous PDEs (heat / wave equations) on graphs. Enables principled design of deep, stable GNNs that resist over-smoothing.</div>
+        <div class="gcard-tags">
+          <span class="gtag primary">Theory</span>
+          <span class="gtag">PDE</span>
+          <span class="gtag">Deep GNNs</span>
+        </div>
+        <div class="gcard-details"><div class="gcard-details-inner">
+          <div class="detail-section"><div class="detail-label">Key Innovation</div><div class="detail-text">GRAND interprets message-passing layers as Euler steps of a diffusion PDE. Continuous-depth GNNs via Neural ODEs on graphs. Alleviates over-smoothing with nonlinear diffusion. Unifies many GNN architectures.</div></div>
+          <div class="detail-section"><div class="detail-label">Use Cases</div><ul class="use-case-list"><li>Long-range graph tasks</li><li>Deep GNN training</li><li>Physics simulation</li></ul></div>
+        </div></div>
+      </div>
+      <div class="card-spacer"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAMILIES -->
+<section class="family-sec" id="families">
+  <div class="inner">
+    <div class="s-eye"><div class="ln"></div><span class="lb">Model family reference</span></div>
+    <h2 class="s-head">Group by architectural lineage</h2>
+    <p class="s-intro">When teams reference a model, it's usually a member of a broader family. These groupings make the genealogy explicit &mdash; useful for procurement evaluations, technical interviews, and architectural reviews.</p>
+    <div class="family-grid fu">
+
+      <div class="family-card" style="--f-color:var(--fam-spectral)">
+        <div class="family-title">Spectral Family</div>
+        <div class="family-members">
+          <span class="family-member">Spectral GCN</span>
+          <span class="family-member">ChebNet</span>
+          <span class="family-member">GCN (Kipf)</span>
+          <span class="family-member">SGC</span>
+          <span class="family-member">APPNP</span>
+          <span class="family-member">BernNet</span>
+          <span class="family-member">FAGCN</span>
+        </div>
+      </div>
+
+      <div class="family-card" style="--f-color:var(--fam-spatial)">
+        <div class="family-title">Spatial / MPNN Family</div>
+        <div class="family-members">
+          <span class="family-member">MPNN</span>
+          <span class="family-member">GraphSAGE</span>
+          <span class="family-member">GIN</span>
+          <span class="family-member">PNA</span>
+          <span class="family-member">DimeNet</span>
+          <span class="family-member">GemNet</span>
+          <span class="family-member">SchNet</span>
+          <span class="family-member">CGCNN</span>
+        </div>
+      </div>
+
+      <div class="family-card" style="--f-color:var(--fam-attention)">
+        <div class="family-title">Attention / Transformer Family</div>
+        <div class="family-members">
+          <span class="family-member">GAT</span>
+          <span class="family-member">GATv2</span>
+          <span class="family-member">HGT</span>
+          <span class="family-member">Graphormer</span>
+          <span class="family-member">SAN</span>
+          <span class="family-member">GPS</span>
+          <span class="family-member">TokenGT</span>
+          <span class="family-member">NAGphormer</span>
+        </div>
+      </div>
+
+      <div class="family-card" style="--f-color:var(--fam-generative)">
+        <div class="family-title">Generative Family</div>
+        <div class="family-members">
+          <span class="family-member">VGAE</span>
+          <span class="family-member">MolGAN</span>
+          <span class="family-member">GraphRNN</span>
+          <span class="family-member">GDSS</span>
+          <span class="family-member">DiGress</span>
+          <span class="family-member">DiffSBDD</span>
+          <span class="family-member">JTVAE</span>
+          <span class="family-member">XTBG</span>
+        </div>
+      </div>
+
+      <div class="family-card" style="--f-color:var(--fam-probabilistic)">
+        <div class="family-title">Probabilistic / Classical Family</div>
+        <div class="family-members">
+          <span class="family-member">Bayesian Networks</span>
+          <span class="family-member">MRF</span>
+          <span class="family-member">CRF</span>
+          <span class="family-member">HMM</span>
+          <span class="family-member">DBN</span>
+          <span class="family-member">Factor Graphs</span>
+          <span class="family-member">Graph Kernels</span>
+        </div>
+      </div>
+
+      <div class="family-card" style="--f-color:var(--fam-scalable)">
+        <div class="family-title">Scalable / Embedding Family</div>
+        <div class="family-members">
+          <span class="family-member">DeepWalk</span>
+          <span class="family-member">Node2Vec</span>
+          <span class="family-member">LINE</span>
+          <span class="family-member">ClusterGCN</span>
+          <span class="family-member">GraphSAINT</span>
+          <span class="family-member">SIGN</span>
+          <span class="family-member">PinSage</span>
+        </div>
+      </div>
+
+      <div class="family-card" style="--f-color:var(--fam-geometric)">
+        <div class="family-title">Geometric / Physics Family</div>
+        <div class="family-members">
+          <span class="family-member">EGNN</span>
+          <span class="family-member">SE(3)-Trans</span>
+          <span class="family-member">NequIP</span>
+          <span class="family-member">MACE</span>
+          <span class="family-member">Evoformer</span>
+          <span class="family-member">AlphaFold3</span>
+          <span class="family-member">PaiNN</span>
+        </div>
+      </div>
+
+      <div class="family-card" style="--f-color:var(--fam-foundation)">
+        <div class="family-title">Foundation / LLM-Graph Family</div>
+        <div class="family-members">
+          <span class="family-member">OFA</span>
+          <span class="family-member">PRODIGY</span>
+          <span class="family-member">GraphFM</span>
+          <span class="family-member">GraphRAG</span>
+          <span class="family-member">G-Retriever</span>
+          <span class="family-member">UniGraph</span>
+          <span class="family-member">HiGPT</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>Structured data is the new strategic surface.</h2>
+  <p>Graphs are how enterprises connect what they know to what their AI can do. The leaders who understand this lineage choose better architectures, ask sharper questions, and build coalitions around AI that can actually be governed.</p>
+  <a class="cta-btn" href="../" id="index">Browse all resources</a>
+</div>
+
+<footer>
+  <div class="fi">
+    <p>&copy; 2026 Alex S. Moy. All rights reserved.</p>
+    <p class="fb">Alex S. Moy &mdash; Architect of AI Alignment</p>
+    <p>Graph-based ML &amp; AI taxonomy &middot; 1988&ndash;2024</p>
+  </div>
+</footer>
+
+<script>
+function toggle(card){
+  card.classList.toggle('expanded');
+}
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});
+},{threshold:0.12});
+document.querySelectorAll('.fu,.gcard').forEach((el,i)=>{
+  el.style.transitionDelay=Math.min(i*0.04,0.4)+'s';
+  io.observe(el);
+});
+const navAs=document.querySelectorAll('.nav-links a');
+const secs=[...document.querySelectorAll('section[id]')];
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY+90;let cur='';
+  secs.forEach(s=>{if(s.offsetTop<=y)cur=s.id;});
+  navAs.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+},{passive:true});
+</script>
+</body>
+</html>
