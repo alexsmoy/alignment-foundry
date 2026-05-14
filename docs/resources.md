@@ -15,6 +15,11 @@ Practical artifacts for enterprise AI leaders — distilled, opinionated, and fr
     <h3>Spiking Neural Networks &amp; Neuromorphic Computing — A Field Taxonomy</h3>
     <p>The evolutionary lineage of brain-inspired computing from 1952 to 2024 — neuron models, learning rules, coding schemes, and the hardware platforms (TrueNorth, Loihi 2, Hala Point) racing to make AI run on a brain&rsquo;s energy budget.</p>
   </a>
+  <a class="card" href="{{ '/resources/icm-workspace-explorer/' | relative_url }}">
+    <p class="card-meta">Reference Workspace · Agent Architecture</p>
+    <h3>ICM Workspace Explorer</h3>
+    <p>A browsable reference for the Interpretable Context Methodology — folder structure as agent architecture. Three workspaces (Process Design, Chartered Ops, System Improvement), every CLAUDE.md, STAGE.md, charter, and skill open for inspection.</p>
+  </a>
 </div>
 
 ## Coming soon

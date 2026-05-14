@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICM Workspace Explorer &middot; Alex S. Moy</title>
+<meta name="description" content="A reference workspace for the Interpretable Context Methodology — folder structure as agent architecture for enterprise AI alignment.">
+<meta name="theme-color" content="#0A2342">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+:root{
+  /* Alignment Foundry brand palette */
+  --deep-blue:#0A2342;
+  --deep-aqua:#14786C;
+  --aquamarine:#67FCF1;
+  --light-teal:#96E5AC;
+  --charcoal:#1C1C1E;
+  --white:#FFFFFF;
+
+  /* Surfaces layered over deep-blue */
+  --bg:var(--deep-blue);
+  --s1:#0F2A50;
+  --s2:#143360;
+  --s3:#1A3D70;
+
+  /* Lines + text */
+  --ln:rgba(255,255,255,0.10);
+  --ln2:rgba(255,255,255,0.20);
+  --txt:var(--white);
+  --txt2:rgba(255,255,255,0.72);
+  --txt3:rgba(255,255,255,0.45);
+
+  /* Functional accents (mapped to brand) */
+  --green:var(--aquamarine);
+  --green-d:rgba(103,252,241,0.10);
+  --amber:var(--light-teal);
+  --amber-d:rgba(150,229,172,0.10);
+  --teal:var(--deep-aqua);
+  --teal-d:rgba(20,120,108,0.22);
+
+  /* Kept for differentiation (memory / charter semantics) */
+  --blue:#7CC8FF;
+  --purple:#C9A8FF;
+  --red:#F87171;
+
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:'Hanken Grotesk',system-ui,sans-serif;
+  --nav-h:56px;
+  --gradient:linear-gradient(135deg,#0A2342 0%,#14786C 55%,#67FCF1 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  display:flex;flex-direction:column;
+}
+
+/* ── NAV ──────────────────────────────────────────────────────────────────── */
+nav{
+  height:var(--nav-h);
+  background:rgba(10,35,66,0.92);
+  backdrop-filter:saturate(140%) blur(10px);
+  border-bottom:1px solid var(--ln);
+  display:flex;align-items:center;padding:0 1rem;gap:0;flex-shrink:0;z-index:200;
+}
+.nav-brand{
+  font-family:var(--sans);font-weight:700;font-size:0.78rem;
+  color:var(--white);letter-spacing:-0.005em;
+  margin-right:1.5rem;white-space:nowrap;
+  display:flex;align-items:center;gap:10px;
+}
+.nav-brand .nav-dot{width:8px;height:8px;border-radius:50%;background:var(--aquamarine);}
+.nav-brand .sep{color:var(--txt3);margin:0 0.45rem;font-weight:500;}
+.nav-brand .nav-title{color:var(--aquamarine);font-weight:500;}
+.nav-tabs{display:flex;height:100%;overflow-x:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{
+  font-family:var(--sans);font-size:0.78rem;font-weight:500;color:var(--txt3);
+  padding:0 1rem;cursor:pointer;display:flex;align-items:center;
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
+  letter-spacing:0.005em;white-space:nowrap;flex-shrink:0;
+}
+.nav-tab:hover{color:var(--white);}
+.nav-tab.on{color:var(--aquamarine);border-bottom-color:var(--aquamarine);}
+
+/* Hamburger — mobile only */
+.hamburger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:36px;height:36px;padding:6px;cursor:pointer;flex-shrink:0;
+  border-radius:5px;transition:background .15s;margin-left:auto;
+}
+.hamburger:hover{background:var(--s2);}
+.hamburger span{display:block;height:2px;background:var(--txt2);border-radius:2px;transition:all .2s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* ── MAIN LAYOUT ──────────────────────────────────────────────────────────── */
+.layout{display:flex;flex:1;overflow:hidden;position:relative;}
+
+/* Overlay backdrop (mobile) */
+.sidebar-backdrop{
+  display:none;position:fixed;inset:0;top:var(--nav-h);
+  background:rgba(0,0,0,0.6);z-index:99;
+}
+.sidebar-backdrop.visible{display:block;}
+
+/* ── SIDEBAR ──────────────────────────────────────────────────────────────── */
+.sidebar{
+  width:280px;flex-shrink:0;background:var(--s1);
+  border-right:1px solid var(--ln);display:flex;flex-direction:column;
+  overflow:hidden;transition:transform .25s cubic-bezier(0.4,0,0.2,1);
+  z-index:100;
+}
+.ws-tabs{display:flex;border-bottom:1px solid var(--ln);flex-shrink:0;background:rgba(10,35,66,0.4);}
+.ws-tab{
+  flex:1;font-family:var(--sans);font-size:0.68rem;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;padding:0.75rem 0;text-align:center;
+  color:var(--txt3);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;min-height:40px;display:flex;align-items:center;justify-content:center;
+}
+.ws-tab:hover{color:var(--txt2);}
+.ws-tab.on{color:var(--aquamarine);border-bottom-color:var(--aquamarine);}
+.tree-scroll{flex:1;overflow-y:auto;padding:8px 0;-webkit-overflow-scrolling:touch;}
+.tree-loading{
+  padding:1rem;font-family:var(--mono);font-size:0.7rem;color:var(--txt3);
+}
+
+/* ── TREE NODES ───────────────────────────────────────────────────────────── */
+.tree-dir-row,.tree-file-row{
+  display:flex;align-items:center;gap:6px;
+  padding:0 10px;font-family:var(--mono);font-size:0.72rem;
+  color:var(--txt2);cursor:pointer;border-radius:3px;
+  margin:0 4px;transition:background .12s,color .12s;white-space:nowrap;overflow:hidden;
+  min-height:30px;
+}
+.tree-dir-row:hover,.tree-file-row:hover{background:var(--s2);color:var(--txt);}
+.tree-dir-row:active,.tree-file-row:active{background:var(--s3);}
+.tree-file-row.on{background:rgba(103,252,241,0.10);color:var(--aquamarine);}
+.tree-icon{width:14px;flex-shrink:0;font-size:0.6rem;text-align:center;opacity:0.7;}
+.tree-name{overflow:hidden;text-overflow:ellipsis;flex:1;}
+.tree-badge{
+  font-size:0.52rem;padding:1px 5px;border-radius:2px;flex-shrink:0;
+  letter-spacing:0.05em;text-transform:uppercase;font-weight:500;
+}
+.tree-children{display:none;}
+.tree-children.open{display:block;}
+
+/* FILE COLORS (mapped to brand palette) */
+.fc-claude{color:var(--aquamarine) !important;}
+.fc-readme{color:var(--light-teal) !important;}
+.fc-stage{color:var(--blue) !important;}
+.fc-charter{color:var(--red) !important;}
+.fc-session{color:var(--purple) !important;}
+.fc-memory{color:var(--purple) !important;}
+.fc-skill{color:var(--light-teal) !important;}
+.fc-state{color:var(--light-teal) !important;}
+.fc-template{color:var(--txt2) !important;}
+.fc-pattern{color:var(--txt2) !important;}
+.fc-input{color:var(--txt2) !important;}
+.fc-config{color:var(--light-teal) !important;}
+
+/* ── CONTENT AREA ─────────────────────────────────────────────────────────── */
+.content-area{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;background:var(--bg);}
+
+/* ── FILE VIEW ────────────────────────────────────────────────────────────── */
+.file-view{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.file-header{
+  flex-shrink:0;background:rgba(10,35,66,0.6);border-bottom:1px solid var(--ln);
+  padding:0 1.25rem;min-height:44px;display:flex;align-items:center;gap:0.75rem;
+  flex-wrap:wrap;
+}
+.file-back-btn{
+  display:none;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:5px;cursor:pointer;
+  color:var(--txt2);font-size:1rem;transition:background .15s;flex-shrink:0;margin-right:0.5rem;
+}
+.file-back-btn:hover{background:var(--s2);color:var(--white);}
+.file-path{font-family:var(--mono);font-size:0.7rem;color:var(--txt3);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;padding:0.5rem 0;}
+.file-path .sep{color:var(--txt3);margin:0 3px;}
+.file-path .fname{color:var(--white);}
+.file-tokens{font-family:var(--mono);font-size:0.65rem;color:var(--txt3);padding:0.5rem 0;white-space:nowrap;padding-left:0.5rem;}
+.file-body{flex:1;overflow-y:auto;padding:2rem 1.5rem;-webkit-overflow-scrolling:touch;}
+
+/* ── MARKDOWN ─────────────────────────────────────────────────────────────── */
+.md-body{max-width:820px;}
+.md-body h1{font-family:var(--sans);font-weight:700;font-size:1.6rem;color:var(--white);margin-bottom:0.9rem;padding-bottom:0.55rem;border-bottom:1px solid var(--ln);letter-spacing:-0.01em;line-height:1.2;}
+.md-body h2{font-family:var(--sans);font-weight:700;font-size:1.2rem;color:var(--aquamarine);margin:1.6rem 0 0.6rem;letter-spacing:-0.005em;}
+.md-body h3{font-family:var(--sans);font-weight:500;font-size:1rem;color:var(--light-teal);margin:1.2rem 0 0.45rem;}
+.md-body h4{font-family:var(--sans);font-weight:500;font-size:0.92rem;color:var(--txt);margin:1rem 0 0.3rem;}
+.md-body p{color:var(--txt2);line-height:1.7;margin-bottom:0.85rem;font-size:0.95rem;}
+.md-body strong{color:var(--white);font-weight:700;}
+.md-body em{color:var(--light-teal);font-style:italic;}
+.md-body a{color:var(--aquamarine);text-decoration:none;border-bottom:1px solid rgba(103,252,241,0.35);transition:color .15s,border-color .15s;}
+.md-body a:hover{color:var(--white);border-bottom-color:var(--aquamarine);}
+.md-body code{font-family:var(--mono);font-size:0.78rem;background:rgba(103,252,241,0.10);padding:1px 6px;border-radius:3px;color:var(--aquamarine);word-break:break-all;}
+.md-body pre{background:rgba(0,0,0,0.30);border:1px solid var(--ln);border-radius:6px;padding:0.9rem 1.1rem;overflow-x:auto;margin:0.85rem 0;-webkit-overflow-scrolling:touch;}
+.md-body pre code{background:none;padding:0;color:var(--txt);font-size:0.78rem;line-height:1.75;word-break:normal;}
+.md-body ul,.md-body ol{padding-left:1.5rem;margin-bottom:0.85rem;}
+.md-body li{color:var(--txt2);line-height:1.7;font-size:0.95rem;margin-bottom:0.25rem;}
+.md-body li code{font-size:0.78rem;}
+.md-body blockquote{border-left:3px solid var(--aquamarine);padding:0.6rem 1rem;background:rgba(103,252,241,0.06);border-radius:0 4px 4px 0;margin:0.85rem 0;}
+.md-body blockquote p{color:var(--white);margin:0;font-size:0.95rem;font-weight:500;}
+.md-body table{width:100%;border-collapse:collapse;margin:0.85rem 0;font-size:0.85rem;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.md-body th{background:rgba(255,255,255,0.04);padding:0.5rem 0.85rem;text-align:left;font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--txt3);border-bottom:1px solid var(--ln);}
+.md-body td{padding:0.5rem 0.85rem;border-bottom:1px solid var(--ln);color:var(--txt2);vertical-align:top;line-height:1.55;}
+.md-body tr:last-child td{border:none;}
+.md-body hr{border:none;border-top:1px solid var(--ln);margin:1.75rem 0;}
+.md-body .task-list-item{list-style:none;margin-left:-1rem;}
+.md-body input[type=checkbox]{margin-right:0.5rem;accent-color:var(--aquamarine);}
+
+/* ── STATIC PANELS ────────────────────────────────────────────────────────── */
+.static-panel{flex:1;overflow-y:auto;padding:2rem 1.5rem;display:none;-webkit-overflow-scrolling:touch;}
+.static-panel.on{display:block;}
+.panel-inner{max-width:1000px;margin:0 auto;}
+.panel-eyebrow{
+  display:flex;align-items:center;gap:12px;margin-bottom:0.85rem;
+}
+.panel-eyebrow .ey-line{width:28px;height:2px;background:var(--aquamarine);}
+.panel-eyebrow .ey-text{
+  font-family:var(--sans);font-size:0.72rem;font-weight:500;
+  letter-spacing:0.08em;text-transform:uppercase;color:var(--aquamarine);
+}
+.panel-title{font-family:var(--sans);font-weight:700;font-size:clamp(1.6rem,3.2vw,2.25rem);letter-spacing:-0.02em;margin-bottom:0.85rem;color:var(--white);line-height:1.15;}
+.panel-title .aq{color:var(--aquamarine);}
+.panel-sub{font-size:1rem;color:var(--txt2);line-height:1.7;margin-bottom:2.25rem;max-width:75ch;}
+
+/* ── CARDS ────────────────────────────────────────────────────────────────── */
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.75rem;}
+.card{
+  background:rgba(255,255,255,0.04);border:1px solid var(--ln);
+  border-radius:10px;padding:1.25rem;
+  transition:border-color .18s,background .18s,transform .18s;
+}
+.card[onclick]{cursor:pointer;}
+.card[onclick]:hover{border-color:var(--aquamarine);background:rgba(103,252,241,0.06);transform:translateY(-2px);}
+.card-ws{font-family:var(--mono);font-size:0.65rem;font-weight:500;margin-bottom:0.55rem;word-break:break-all;letter-spacing:0.02em;}
+.card-title{font-weight:700;font-size:1rem;margin-bottom:0.4rem;color:var(--white);letter-spacing:-0.005em;}
+.card-body{font-size:0.88rem;color:var(--txt2);line-height:1.6;}
+.card-tags{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.75rem;}
+.ctag{font-family:var(--mono);font-size:0.58rem;padding:3px 7px;border-radius:3px;letter-spacing:0.04em;font-weight:500;}
+
+/* ── PRINCIPLES ───────────────────────────────────────────────────────────── */
+.principles{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--ln);border-radius:10px;overflow:hidden;border:1px solid var(--ln);margin-bottom:1.75rem;}
+.pr{background:rgba(10,35,66,0.6);padding:1rem;}
+.pr-n{font-family:var(--mono);font-size:0.65rem;color:var(--aquamarine);letter-spacing:0.1em;margin-bottom:0.45rem;font-weight:500;}
+.pr-t{font-weight:700;font-size:0.88rem;color:var(--white);margin-bottom:0.4rem;letter-spacing:-0.005em;}
+.pr-b{font-size:0.78rem;color:var(--txt2);line-height:1.6;}
+
+/* ── SYNTHESIS TABLE ──────────────────────────────────────────────────────── */
+.syn-table{width:100%;border-collapse:collapse;border:1px solid var(--ln);border-radius:10px;overflow:hidden;margin-bottom:1.75rem;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.syn-table table{width:100%;border-collapse:collapse;}
+.syn-table th{background:rgba(255,255,255,0.04);padding:0.6rem 1rem;font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--txt3);text-align:left;border-bottom:1px solid var(--ln);white-space:nowrap;font-weight:500;}
+.syn-table td{padding:0.7rem 1rem;border-bottom:1px solid var(--ln);font-size:0.86rem;color:var(--txt2);vertical-align:top;line-height:1.55;min-width:180px;}
+.syn-table tr:last-child td{border:none;}
+.syn-table code{font-family:var(--mono);font-size:0.7rem;background:rgba(103,252,241,0.10);padding:1px 5px;border-radius:3px;color:var(--aquamarine);}
+
+/* ── CALLOUT ──────────────────────────────────────────────────────────────── */
+.callout{border-left:3px solid var(--aquamarine);background:rgba(103,252,241,0.06);border-radius:0 6px 6px 0;padding:0.9rem 1rem;margin:1rem 0;font-size:0.9rem;color:var(--txt2);line-height:1.65;}
+.callout strong{color:var(--aquamarine);}
+.callout.amber{border-color:var(--light-teal);background:rgba(150,229,172,0.06);}
+.callout.amber strong{color:var(--light-teal);}
+
+/* ── TOKEN BARS ───────────────────────────────────────────────────────────── */
+.tok-bar{margin-bottom:1.75rem;}
+.tok-title{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--txt3);margin-bottom:1rem;font-weight:500;}
+.tok-row{display:flex;align-items:center;gap:0.7rem;margin-bottom:0.6rem;}
+.tok-label{font-family:var(--mono);font-size:0.68rem;color:var(--txt2);width:210px;flex-shrink:0;}
+.tok-wrap{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;}
+.tok-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1);}
+.tok-num{font-family:var(--mono);font-size:0.62rem;color:var(--txt3);width:60px;text-align:right;}
+
+/* ── WELCOME ──────────────────────────────────────────────────────────────── */
+.welcome{padding:3rem 1.75rem;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;flex:1;}
+.welcome-icon{font-size:2.25rem;margin-bottom:1.1rem;}
+.welcome-title{font-family:var(--sans);font-weight:700;font-size:1.2rem;color:var(--white);margin-bottom:0.5rem;letter-spacing:-0.005em;}
+.welcome-sub{font-size:0.92rem;color:var(--txt2);line-height:1.65;max-width:48ch;}
+
+/* ── SCROLLBARS ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(103,252,241,0.20);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(103,252,241,0.40);}
+
+/* ── MOBILE BREAKPOINT ────────────────────────────────────────────────────── */
+@media(max-width:700px){
+  .nav-brand{font-size:0.7rem;margin-right:0.5rem;}
+  .nav-brand .nav-title{display:none;}
+  .hamburger{display:flex;}
+
+  .sidebar{
+    position:fixed;top:var(--nav-h);left:0;bottom:0;
+    width:80vw;max-width:300px;
+    transform:translateX(-100%);
+    box-shadow:4px 0 24px rgba(0,0,0,0.4);
+  }
+  .sidebar.open{transform:translateX(0);}
+
+  .tree-dir-row,.tree-file-row{min-height:38px;font-size:0.76rem;}
+  .tree-badge{display:none;}
+
+  .content-area{width:100%;}
+  .file-back-btn{display:flex;}
+
+  .file-header{flex-wrap:wrap;padding:0 0.85rem;min-height:46px;}
+  .file-path{font-size:0.65rem;padding:0.4rem 0;}
+  .file-tokens{font-size:0.6rem;width:100%;padding:0 0 0.4rem 0;color:var(--txt3);}
+  .file-body{padding:1.5rem 1.1rem;}
+
+  .static-panel{padding:1.5rem 1.1rem;}
+  .panel-title{font-size:1.55rem;}
+
+  .card-grid{grid-template-columns:1fr;}
+  .card{padding:1.1rem;}
+
+  .principles{grid-template-columns:repeat(2,1fr);}
+  .syn-table td{min-width:140px;font-size:0.78rem;}
+  .tok-label{width:140px;font-size:0.62rem;}
+
+  [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr !important;}
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
+}
+
+@media(min-width:701px) and (max-width:1000px){
+  .sidebar{width:240px;}
+  .card-grid{grid-template-columns:1fr 1fr;}
+  .principles{grid-template-columns:repeat(3,1fr);}
+  .tok-label{width:180px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <span class="nav-dot"></span>
+    <span>Alex S. Moy</span>
+    <span class="sep">/</span>
+    <span class="nav-title">ICM Workspace Explorer</span>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab on" onclick="showPanel('explorer')">Explorer</div>
+    <div class="nav-tab" onclick="showPanel('overview')">Overview</div>
+    <div class="nav-tab" onclick="showPanel('principles')">Principles</div>
+    <div class="nav-tab" onclick="showPanel('synthesis')">Synthesis Map</div>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Toggle file tree">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div class="layout">
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+
+  <div class="sidebar">
+    <div class="ws-tabs">
+      <div class="ws-tab on" onclick="switchWs(0)">Process</div>
+      <div class="ws-tab" onclick="switchWs(1)">Ops</div>
+      <div class="ws-tab" onclick="switchWs(2)">Improve</div>
+    </div>
+    <div class="tree-scroll" id="tree">
+      <div class="tree-loading">Loading workspace&hellip;</div>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- FILE VIEW -->
+    <div class="file-view" id="file-view" style="display:none">
+      <div class="file-header">
+        <div class="file-back-btn" onclick="openSidebar()" title="Back to files">&#8592;</div>
+        <div class="file-path" id="file-path-display"></div>
+        <div class="file-tokens" id="file-tokens-display"></div>
+      </div>
+      <div class="file-body">
+        <div class="md-body" id="md-content"></div>
+      </div>
+    </div>
+
+    <!-- WELCOME -->
+    <div class="welcome" id="welcome-view">
+      <div class="welcome-icon">📁</div>
+      <div class="welcome-title">Select a file to view its contents</div>
+      <div class="welcome-sub">Browse the workspace tree on the left.<br>Every markdown file is loaded on demand and rendered with full formatting.</div>
+    </div>
+
+    <!-- OVERVIEW PANEL -->
+    <div class="static-panel" id="panel-overview">
+      <div class="panel-inner">
+        <div class="panel-eyebrow"><div class="ey-line"></div><span class="ey-text">Interpretable Context Methodology</span></div>
+        <div class="panel-title">Folder structure as <span class="aq">agent architecture</span></div>
+        <div class="panel-sub">ICM replaces framework-level orchestration with filesystem structure. Numbered stage folders represent workflow steps. Plain markdown files carry the context and instructions. One agent reads the right files at the right moment &mdash; no coordination framework required.</div>
+        <div class="card-grid">
+          <div class="card" onclick="switchWs(0);showPanel('explorer')">
+            <div class="card-ws" style="color:var(--aquamarine)">process-design-workspace/</div>
+            <div class="card-title">Process Design</div>
+            <div class="card-body">Sequential 6-stage pipeline: intake &rarr; SIPOC &rarr; decompose &rarr; score &rarr; PACE/RACI &rarr; artifacts. For designing and documenting new automations.</div>
+            <div class="card-tags"><span class="ctag" style="background:var(--green-d);color:var(--aquamarine)">6 stages</span><span class="ctag" style="background:rgba(255,255,255,0.05);color:var(--txt2)">4 skills</span><span class="ctag" style="background:rgba(255,255,255,0.05);color:var(--txt2)">10 artifacts</span></div>
+          </div>
+          <div class="card" onclick="switchWs(1);showPanel('explorer')">
+            <div class="card-ws" style="color:var(--light-teal)">chartered-ops-workspace/</div>
+            <div class="card-title">Chartered Operations</div>
+            <div class="card-body">Long-running chartered agent with 4-layer memory, continuous improvement loop, and human collaboration gates. Scope-bounded by an immutable charter.</div>
+            <div class="card-tags"><span class="ctag" style="background:var(--amber-d);color:var(--light-teal)">6 stages</span><span class="ctag" style="background:rgba(248,113,113,0.12);color:var(--red)">charter</span><span class="ctag" style="background:rgba(201,168,255,0.12);color:var(--purple)">4 memory layers</span></div>
+          </div>
+          <div class="card" onclick="switchWs(2);showPanel('explorer')">
+            <div class="card-ws" style="color:var(--purple)">system-improvement-workspace/</div>
+            <div class="card-title">System Improvement</div>
+            <div class="card-body">Multi-agent scanning pipeline with correlation, fix generation, CI validation, human review gate, and a changelog-linked learning loop.</div>
+            <div class="card-tags"><span class="ctag" style="background:rgba(201,168,255,0.12);color:var(--purple)">6 stages</span><span class="ctag" style="background:rgba(255,255,255,0.05);color:var(--txt2)">10 scan agents</span></div>
+          </div>
+        </div>
+        <div class="callout"><strong>How to use this explorer:</strong> Select a workspace tab (Process / Ops / Improve), expand folders in the sidebar, and click any file to read its full content rendered as markdown. The Overview, Principles, and Synthesis Map tabs are in the top navigation.</div>
+      </div>
+    </div>
+
+    <!-- PRINCIPLES PANEL -->
+    <div class="static-panel" id="panel-principles">
+      <div class="panel-inner">
+        <div class="panel-eyebrow"><div class="ey-line"></div><span class="ey-text">ICM Design Principles</span></div>
+        <div class="panel-title">How the framework <span class="aq">is structured</span></div>
+        <div class="panel-sub">Each of Van Clief's five ICM principles maps directly to design decisions across all three workspace types, plus one additional pattern we added.</div>
+        <div class="principles">
+          <div class="pr"><div class="pr-n">01</div><div class="pr-t">One stage, one job</div><div class="pr-b">Each numbered folder handles exactly one step. A stage that decomposes never also scores. Enforced via STAGE.md scope.</div></div>
+          <div class="pr"><div class="pr-n">02</div><div class="pr-t">Plain text interface</div><div class="pr-b">All inter-stage communication via markdown files. No database. No API calls between stages. Human-editable at any point.</div></div>
+          <div class="pr"><div class="pr-n">03</div><div class="pr-t">Every output editable</div><div class="pr-b">Agent stops after each stage. Human opens output files, edits freely. Agent uses edited versions as authoritative.</div></div>
+          <div class="pr"><div class="pr-n">04</div><div class="pr-t">Configure the factory</div><div class="pr-b"><code style="font-size:0.7rem;background:rgba(103,252,241,0.10);padding:1px 5px;border-radius:2px;color:var(--aquamarine)">_core/</code> holds stable reference material. Set up once. Run many times.</div></div>
+          <div class="pr"><div class="pr-n">05</div><div class="pr-t">Progressive disclosure</div><div class="pr-b">CLAUDE.md (~400 tok) always loaded. STAGE.md (~300 tok) swaps per stage. Skills load on demand, one at a time.</div></div>
+        </div>
+        <div class="card" style="margin-bottom:1.75rem">
+          <div class="card-ws" style="color:var(--light-teal)">Our addition to ICM</div>
+          <div class="card-title">Charter as constitutional memory</div>
+          <div class="card-body">ICM's original design doesn't address bounded agents or scope enforcement. We add the Charter as a constitutional memory layer: always loaded first, overrides everything else, human-writable only. The agent can propose charter amendments but cannot self-approve them. This solves the scope creep problem directly in the filesystem &mdash; not in code.</div>
+        </div>
+        <div class="tok-bar">
+          <div class="tok-title">Progressive disclosure &mdash; context window usage per layer</div>
+          <div class="tok-row"><div class="tok-label">CLAUDE.md (always loaded)</div><div class="tok-wrap"><div class="tok-fill" data-w="8" style="width:0%;background:var(--aquamarine)"></div></div><div class="tok-num">~400 tok</div></div>
+          <div class="tok-row"><div class="tok-label">Charter (always, ops workspace)</div><div class="tok-wrap"><div class="tok-fill" data-w="6" style="width:0%;background:var(--light-teal)"></div></div><div class="tok-num">~300 tok</div></div>
+          <div class="tok-row"><div class="tok-label">SESSION.md (each session)</div><div class="tok-wrap"><div class="tok-fill" data-w="5" style="width:0%;background:var(--purple)"></div></div><div class="tok-num">~250 tok</div></div>
+          <div class="tok-row"><div class="tok-label">STAGE.md (current stage only)</div><div class="tok-wrap"><div class="tok-fill" data-w="6" style="width:0%;background:var(--blue)"></div></div><div class="tok-num">~300 tok</div></div>
+          <div class="tok-row"><div class="tok-label">One skill (loaded on demand)</div><div class="tok-wrap"><div class="tok-fill" data-w="20" style="width:0%;background:var(--deep-aqua)"></div></div><div class="tok-num">~1.5k tok</div></div>
+          <div class="tok-row"><div class="tok-label">Stage input files (current stage)</div><div class="tok-wrap"><div class="tok-fill" data-w="15" style="width:0%;background:var(--txt3)"></div></div><div class="tok-num">~1k tok</div></div>
+          <div class="tok-row"><div class="tok-label">Deep reference (rarely loaded)</div><div class="tok-wrap"><div class="tok-fill" data-w="50" style="width:0%;background:rgba(255,255,255,0.18)"></div></div><div class="tok-num">5k+ tok</div></div>
+        </div>
+        <div class="callout amber"><strong>Context rot prevention:</strong> Loading all skills, all memory, and all stage outputs simultaneously causes the agent to blend contexts &mdash; producing outputs that violate scope or use the wrong skill's patterns. Progressive disclosure keeps each stage focused on exactly its single job.</div>
+      </div>
+    </div>
+
+    <!-- SYNTHESIS PANEL -->
+    <div class="static-panel" id="panel-synthesis">
+      <div class="panel-inner">
+        <div class="panel-eyebrow"><div class="ey-line"></div><span class="ey-text">Framework synthesis</span></div>
+        <div class="panel-title">How everything maps to <span class="aq">workspace files</span></div>
+        <div class="panel-sub">Each framework from the full design session becomes a specific file, folder, or memory layer in one of the three workspaces. Nothing is discarded &mdash; everything has a home.</div>
+        <table class="syn-table">
+          <thead><tr><th>Framework</th><th>Maps to in ICM</th><th>Workspace</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:var(--white)">Work Decomposition</strong><br>8-phase framework, SIPOC, HTA, automation scoring, PACE, RACI, VSM</td><td>Stages 01&ndash;05 + Stage 06 monitor<br><code>_core/skills/work-decomposition/SKILL.md</code><br><code>_core/skills/automation-scoring/SKILL.md</code><br><code>_core/skills/pace-design/SKILL.md</code></td><td style="color:var(--aquamarine)">process-design-workspace/</td></tr>
+            <tr><td><strong style="color:var(--white)">Living Process Architecture</strong><br>Feedback loop, exception capture, AI analysis, human approval, versioned changelog</td><td>Stage 06 (monitor) findings/proposals/decisions<br><code>06-monitor/changelog/process-changelog.md</code></td><td style="color:var(--aquamarine)">process-design-workspace/</td></tr>
+            <tr><td><strong style="color:var(--white)">Chartered Agent Architecture</strong><br>Charter pattern, 4-layer memory, scope enforcement, improvement loop, collab model</td><td>CLAUDE.md + entire <code>_memory/</code> hierarchy<br><code>_memory/constitutional/charter.md</code><br>All 6 STAGE.md files</td><td style="color:var(--light-teal)">chartered-ops-workspace/</td></tr>
+            <tr><td><strong style="color:var(--white)">Ops Intelligence System</strong><br>10 scanning agents, finding-to-fix pipeline, correlation, remediation</td><td>All 6 stages of system-improvement-workspace<br><code>_core/skills/ops-intelligence/SKILL.md</code><br><code>_core/agent-configs/scan-targets.md</code></td><td style="color:var(--purple)">system-improvement-workspace/</td></tr>
+            <tr><td><strong style="color:var(--white)">ICM (Van Clief)</strong><br>Folder-as-architecture, one stage one job, plain text, progressive disclosure</td><td>The organizing principle for all three workspaces.<br>Every CLAUDE.md, STAGE.md, and <code>_core/</code> structure.</td><td style="color:var(--blue)">All three workspaces</td></tr>
+          </tbody>
+        </table>
+        <div class="callout"><strong>The complete synthesis:</strong> ICM provides the structural pattern (how to organize files and stages). Our frameworks provide the content (what each stage does, what skills contain). The chartered agent pattern provides governance (what the agent can and cannot do). Progressive disclosure optimizes context (what gets loaded when). Together: a complete, deployable, bounded agent system.</div>
+        <div style="margin-top:1.75rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+          <div class="card"><div class="card-ws" style="color:var(--aquamarine)">process-design outputs</div><div style="font-size:0.85rem;color:var(--txt2);line-height:1.7">SIPOC &middot; Decomposition tree &middot; Mermaid flow &middot; Automation scorecard &middot; Tech fit matrix &middot; PACE blocks &middot; RACI matrix &middot; Value stream &middot; Implementation roadmap &middot; Process spec sheet</div></div>
+          <div class="card"><div class="card-ws" style="color:var(--light-teal)">chartered-ops outputs</div><div style="font-size:0.85rem;color:var(--txt2);line-height:1.7">Signed charter &middot; Session state &middot; Finding log &middot; Scoped proposals &middot; Decision audit trail &middot; Weekly learning summaries &middot; Growing semantic knowledge base &middot; Mandate progress tracking</div></div>
+          <div class="card"><div class="card-ws" style="color:var(--purple)">system-improvement outputs</div><div style="font-size:0.85rem;color:var(--txt2);line-height:1.7">Correlated issues &middot; Root cause clusters &middot; Fix proposals with diffs &middot; Staging validation records &middot; Human review queue &middot; Deployment log with provenance &middot; Outcome measurements &middot; System changelog</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /layout -->
+
+<script>
+
+// ─── DATA LOADING ─────────────────────────────────────────────────────────────
+// Workspace tree and file contents are loaded from data/ on demand.
+
+const WS_ROOTS = [
+  'process-design-workspace',
+  'chartered-ops-workspace',
+  'system-improvement-workspace'
+];
+
+let MANIFEST = null;            // { workspaces: [...], files: [...] }
+const FILE_CACHE = {};          // path -> markdown string
+
+async function loadManifest() {
+  const res = await fetch('data/manifest.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error('manifest.json failed: ' + res.status);
+  MANIFEST = await res.json();
+}
+
+async function loadFileContent(path) {
+  if (FILE_CACHE[path] !== undefined) return FILE_CACHE[path];
+  const res = await fetch('data/' + path, { cache: 'no-cache' });
+  if (!res.ok) throw new Error(path + ' failed: ' + res.status);
+  const text = await res.text();
+  FILE_CACHE[path] = text;
+  return text;
+}
+
+// ─── FILE CLASSIFICATION ──────────────────────────────────────────────────────
+
+function classify(name, path) {
+  if (name === 'CLAUDE.md') return { cls: 'fc-claude', badge: 'always loaded', badgeStyle: 'background:var(--green-d);color:var(--aquamarine)' };
+  if (name === 'README.md') return { cls: 'fc-readme', badge: 'readme', badgeStyle: 'background:var(--amber-d);color:var(--light-teal)' };
+  if (name === 'STAGE.md') return { cls: 'fc-stage', badge: 'stage', badgeStyle: 'background:rgba(124,200,255,0.12);color:var(--blue)' };
+  if (name === 'charter.md') return { cls: 'fc-charter', badge: 'immutable', badgeStyle: 'background:rgba(248,113,113,0.12);color:var(--red)' };
+  if (name === 'SESSION.md') return { cls: 'fc-session', badge: 'session', badgeStyle: 'background:rgba(201,168,255,0.12);color:var(--purple)' };
+  if (name.includes('SKILL.md')) return { cls: 'fc-skill', badge: 'skill', badgeStyle: 'background:var(--teal-d);color:var(--light-teal)' };
+  if (name === '_state.md') return { cls: 'fc-state', badge: 'state', badgeStyle: 'background:var(--amber-d);color:var(--light-teal)' };
+  if (name.includes('scan-targets')) return { cls: 'fc-config', badge: 'config', badgeStyle: 'background:var(--amber-d);color:var(--light-teal)' };
+  if (path.includes('_memory/')) return { cls: 'fc-memory', badge: '', badgeStyle: '' };
+  if (path.includes('_core/patterns/')) return { cls: 'fc-pattern', badge: 'pattern', badgeStyle: 'background:rgba(255,255,255,0.05);color:var(--txt2)' };
+  if (path.includes('input/')) return { cls: 'fc-input', badge: 'template', badgeStyle: 'background:rgba(255,255,255,0.05);color:var(--txt2)' };
+  return { cls: '', badge: '', badgeStyle: '' };
+}
+
+function tokenCount(content) {
+  const toks = Math.round(content.length / 4);
+  if (toks < 1000) return `~${toks} tokens`;
+  return `~${(toks / 1000).toFixed(1)}k tokens`;
+}
+
+// ─── TREE BUILDING ────────────────────────────────────────────────────────────
+
+let currentWs = 0;
+let currentFile = null;
+let expandedDirs = {};
+
+function getWsPaths(wsRoot) {
+  if (!MANIFEST) return [];
+  return MANIFEST.files.filter(p => p.startsWith(wsRoot + '/')).sort();
+}
+
+function buildTreeData(wsRoot) {
+  const paths = getWsPaths(wsRoot);
+  const root = {};
+  for (const path of paths) {
+    const rel = path.slice(wsRoot.length + 1);
+    const parts = rel.split('/');
+    let node = root;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (i === parts.length - 1) {
+        node[part] = { type: 'file', path };
+      } else {
+        if (!node[part]) node[part] = { type: 'dir', children: {} };
+        node = node[part].children;
+      }
+    }
+  }
+  return root;
+}
+
+function renderTree(node, depth = 0, parentPath = '') {
+  const container = document.createElement('div');
+
+  const entries = Object.entries(node).sort(([an, av], [bn, bv]) => {
+    const aIsDir = av.type === 'dir';
+    const bIsDir = bv.type === 'dir';
+    const aSpecial = an.startsWith('_');
+    const bSpecial = bn.startsWith('_');
+    if (aIsDir !== bIsDir) return aIsDir ? -1 : 1;
+    if (aSpecial !== bSpecial) return aSpecial ? -1 : 1;
+    return an.localeCompare(bn);
+  });
+
+  for (const [name, node_data] of entries) {
+    const fullPath = parentPath ? parentPath + '/' + name : name;
+
+    if (node_data.type === 'dir') {
+      const dirId = 'dir-' + fullPath.replace(/[^a-zA-Z0-9]/g, '-');
+      const isOpen = expandedDirs[dirId] || false;
+
+      const icons = {
+        '_core': '⚙', '_memory': '🧠', 'skills': '📚', 'patterns': '📋',
+        'input': '📥', 'output': '📤', 'findings': '🔍', 'baseline': '📊',
+        'proposals': '✏️', 'drafts': '✏️', 'queue': '⏳', 'decisions': '✅',
+        'approved': '✅', 'rejected': '✗', 'completed': '✓', 'outcomes': '📊',
+        'deployed': '🚀', 'changelog': '📋', 'escalations': '⚠️', 'rollbacks': '↩️',
+        'anomalies': '⚠️', 'constitutional': '🔒', 'working': '⚡',
+        'episodic': '📅', 'semantic': '📚', 'model-updates': '🔄',
+        'weekly-summaries': '📅', 'agent-configs': '⚙️',
+      };
+      const icon = icons[name] || '📁';
+
+      const row = document.createElement('div');
+      row.className = 'tree-dir-row';
+      row.style.paddingLeft = (10 + depth * 14) + 'px';
+      row.innerHTML = `<span class="tree-icon">${isOpen ? '▾' : '▸'}</span><span class="tree-icon">${icon}</span><span class="tree-name" style="color:var(--txt2)">${name}/</span>`;
+
+      const children = document.createElement('div');
+      children.className = 'tree-children' + (isOpen ? ' open' : '');
+      children.id = dirId + '-children';
+
+      const subTree = renderTree(node_data.children, depth + 1, fullPath);
+      children.appendChild(subTree);
+
+      row.onclick = () => {
+        const open = children.classList.toggle('open');
+        expandedDirs[dirId] = open;
+        row.querySelector('.tree-icon').textContent = open ? '▾' : '▸';
+      };
+
+      container.appendChild(row);
+      container.appendChild(children);
+
+    } else {
+      const filePath = WS_ROOTS[currentWs] + '/' + fullPath;
+      const { cls, badge, badgeStyle } = classify(name, fullPath);
+
+      const row = document.createElement('div');
+      row.className = 'tree-file-row' + (currentFile === filePath ? ' on' : '');
+      row.style.paddingLeft = (10 + depth * 14) + 'px';
+      row.id = 'file-row-' + filePath.replace(/[^a-zA-Z0-9]/g, '-');
+
+      const fileIcon = name.endsWith('.md') ? '📄' : '📄';
+      const badgeHtml = badge ? `<span class="tree-badge" style="${badgeStyle}">${badge}</span>` : '';
+      row.innerHTML = `<span class="tree-icon"></span><span class="tree-icon">${fileIcon}</span><span class="tree-name ${cls}">${name}</span>${badgeHtml}`;
+
+      row.onclick = () => openFile(filePath);
+      container.appendChild(row);
+    }
+  }
+  return container;
+}
+
+function refreshTree() {
+  const wsRoot = WS_ROOTS[currentWs];
+  const treeData = buildTreeData(wsRoot);
+  const treeEl = document.getElementById('tree');
+  treeEl.innerHTML = '';
+  treeEl.appendChild(renderTree(treeData));
+}
+
+// ─── FILE OPENING ─────────────────────────────────────────────────────────────
+
+async function openFile(path) {
+  let content;
+  try {
+    content = await loadFileContent(path);
+  } catch (err) {
+    console.error(err);
+    return;
+  }
+
+  // Update tree selection
+  if (currentFile) {
+    const oldRow = document.getElementById('file-row-' + currentFile.replace(/[^a-zA-Z0-9]/g, '-'));
+    if (oldRow) oldRow.classList.remove('on');
+  }
+  currentFile = path;
+  const newRow = document.getElementById('file-row-' + path.replace(/[^a-zA-Z0-9]/g, '-'));
+  if (newRow) newRow.classList.add('on');
+
+  document.getElementById('welcome-view').style.display = 'none';
+  document.getElementById('file-view').style.display = 'flex';
+
+  showPanelExplorer();
+
+  const parts = path.split('/');
+  const ws = parts[0];
+  const rest = parts.slice(1);
+  const wsColors = {
+    'process-design-workspace': 'var(--aquamarine)',
+    'chartered-ops-workspace': 'var(--light-teal)',
+    'system-improvement-workspace': 'var(--purple)'
+  };
+  const wsParts = rest.slice(0, -1).map(p => `<span style="color:var(--txt3)">${p}</span>`);
+  const fname = rest[rest.length - 1];
+  const { cls } = classify(fname, path);
+
+  let pathHtml = `<span style="color:${wsColors[ws] || 'var(--aquamarine)'}">${ws}</span>`;
+  if (wsParts.length > 0) pathHtml += `<span class="sep">/</span>` + wsParts.join('<span class="sep">/</span>');
+  pathHtml += `<span class="sep">/</span><span class="fname ${cls}">${fname}</span>`;
+
+  document.getElementById('file-path-display').innerHTML = pathHtml;
+  document.getElementById('file-tokens-display').textContent = tokenCount(content);
+
+  const html = marked.parse(content);
+  document.getElementById('md-content').innerHTML = html;
+
+  document.querySelector('.file-body').scrollTop = 0;
+
+  if (window.innerWidth <= 700) closeSidebar();
+}
+
+// ─── PANEL MANAGEMENT ─────────────────────────────────────────────────────────
+
+function showPanelExplorer() {
+  document.querySelectorAll('.static-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('on'));
+  document.querySelector('.nav-tab[onclick="showPanel(\'explorer\')"]').classList.add('on');
+}
+
+function showPanel(name) {
+  document.querySelectorAll('.static-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('on'));
+  document.querySelector(`.nav-tab[onclick="showPanel('${name}')"]`).classList.add('on');
+
+  if (name === 'explorer') {
+    if (currentFile) {
+      document.getElementById('file-view').style.display = 'flex';
+      document.getElementById('welcome-view').style.display = 'none';
+    } else {
+      document.getElementById('file-view').style.display = 'none';
+      document.getElementById('welcome-view').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('file-view').style.display = 'none';
+    document.getElementById('welcome-view').style.display = 'none';
+    const panel = document.getElementById('panel-' + name);
+    if (panel) panel.classList.add('on');
+
+    if (name === 'principles') {
+      setTimeout(() => {
+        document.querySelectorAll('.tok-fill').forEach(bar => {
+          bar.style.width = bar.dataset.w + '%';
+        });
+      }, 100);
+    }
+  }
+}
+
+// ─── WORKSPACE SWITCH ─────────────────────────────────────────────────────────
+
+function switchWs(idx) {
+  currentWs = idx;
+  expandedDirs = {};
+  initExpandedDirs(WS_ROOTS[currentWs]);
+  document.querySelectorAll('.ws-tab').forEach((t, i) => t.classList.toggle('on', i === idx));
+  refreshTree();
+
+  currentFile = null;
+  document.getElementById('file-view').style.display = 'none';
+  document.getElementById('welcome-view').style.display = 'flex';
+  showPanelExplorer();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+function initExpandedDirs(wsRoot) {
+  const paths = getWsPaths(wsRoot);
+  for (const path of paths) {
+    const rel = path.slice(wsRoot.length + 1);
+    const topLevel = rel.split('/')[0];
+    const dirId = 'dir-' + topLevel.replace(/[^a-zA-Z0-9]/g, '-');
+    if (!topLevel.includes('.')) {
+      expandedDirs[dirId] = true;
+    }
+  }
+}
+
+(async function init() {
+  try {
+    await loadManifest();
+    initExpandedDirs(WS_ROOTS[0]);
+    refreshTree();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('tree').innerHTML =
+      '<div class="tree-loading" style="color:var(--red)">Failed to load workspace data.<br>' +
+      'Open this page via a server (not file://).</div>';
+  }
+  showPanel('overview');
+})();
+
+// ─── MOBILE SIDEBAR ───────────────────────────────────────────────────────────
+
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const hamburger = document.getElementById('hamburger');
+  const isOpen = sidebar.classList.toggle('open');
+  backdrop.classList.toggle('visible', isOpen);
+  hamburger.classList.toggle('open', isOpen);
+}
+
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-backdrop').classList.remove('visible');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+function openSidebar() {
+  if (window.innerWidth <= 700) {
+    document.querySelector('.sidebar').classList.add('open');
+    document.getElementById('sidebar-backdrop').classList.add('visible');
+    document.getElementById('hamburger').classList.add('open');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSidebar();
+});
+
+</script>
+</body>
+</html>
