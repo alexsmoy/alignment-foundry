@@ -1,0 +1,47 @@
+name: ICM dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: Task prompt for the agent
+        required: true
+        type: string
+      project:
+        description: Project name (output path prefix)
+        required: true
+        type: string
+      output_branch:
+        description: Output branch name (auto-generated if blank)
+        required: false
+        type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+      ICM_PROJECT:       ${{ github.event.inputs.project }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run agent
+        run: claude --prompt "${{ github.event.inputs.prompt }}" --config claude.json
+
+      - name: Commit and push artifact
+        run: |
+          SLUG=$(echo "${{ github.event.inputs.prompt }}" \
+            | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | cut -c1-48)
+          BRANCH="${{ github.event.inputs.output_branch }}"
+          BRANCH="${BRANCH:-output/$(date +%Y-%m-%d)-${SLUG}}"
+          git config user.name "icm-agent"
+          git config user.email "icm-agent@noreply"
+          git checkout -b "$BRANCH"
+          git add --force projects/
+          git commit -m "run: ${{ github.event.inputs.prompt }}"
+          git push origin "$BRANCH"
+          echo "artifact_branch=$BRANCH" >> $GITHUB_OUTPUT
