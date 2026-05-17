@@ -31,13 +31,15 @@ Read the matched skill file **in full** before taking any action.
 
 ## Workspace routing table
 
-Used in run mode to route a prompt to its target workspace. No workspaces are
-defined yet — run `[BUILD] add workspace {name}` to create the first one, and
-build mode will add its row here.
+Used in run mode to route a prompt to its target workspace. Build mode adds a
+row here whenever it creates a new workspace.
 
 | Workspace | Purpose |
 |---|---|
-| _(none yet)_ | _Run `[BUILD] add workspace {name}` to create the first workspace._ |
+| `competitive-intel` | Source-cited intelligence on competitor companies — financials, product moves, and public positioning. |
+
+`competitive-intel` ships as a sample workspace to illustrate the four-level
+hierarchy. Remove it for a clean deployment.
 
 ## Repo structure map
 

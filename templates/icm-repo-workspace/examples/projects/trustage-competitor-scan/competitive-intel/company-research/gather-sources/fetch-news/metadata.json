@@ -1,0 +1,16 @@
+{
+  "run_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "project": "trustage-competitor-scan",
+  "workspace": "competitive-intel",
+  "workflow": "company-research",
+  "workstage": "gather-sources",
+  "task": "fetch-news",
+  "prompt": "research TruStage",
+  "timestamp": "2026-05-17T14:03:40Z",
+  "status": "complete",
+  "mode": "run",
+  "agent": "claude-code",
+  "branch": "output/2026-05-17-research-trustage",
+  "assumptions": "Project name 'trustage-competitor-scan' derived from the prompt; prompt routed to competitive-intel / company-research.",
+  "error": null
+}

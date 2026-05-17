@@ -41,9 +41,10 @@ the prompt.
    ```bash
    cp .github/hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
    ```
-4. Create your first workspace by dispatching a build prompt:
+4. Explore the bundled `competitive-intel` sample workspace, or create your
+   own by dispatching a build prompt:
    ```
-   [BUILD] add workspace competitive-intel
+   [BUILD] add workspace {name}
    ```
 5. Run a task by dispatching the **ICM dispatch** workflow (Actions tab) with a
    prompt and a project name.
@@ -58,8 +59,12 @@ claude.json      Claude Code tool / MCP config
 skills/          run.md and build.md — the mode contracts
 workspaces/      workspace definitions (read-only in run mode)
 projects/        runtime output — never committed to main
+examples/        a frozen sample run — illustration only, not read by the agent
 .github/         dispatch + guard-main workflows, pre-push hook
 ```
+
+The `competitive-intel` workspace and the `examples/` directory ship as a
+worked example. Delete both for a clean deployment.
 
 ## Guarantees
 
