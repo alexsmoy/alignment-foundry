@@ -118,7 +118,7 @@ The `[BUILD]` tag must appear at the very start of the prompt to activate build 
 | Prompt | Mode |
 |---|---|
 | `[BUILD] add workspace competitive-intel` | Build |
-| `research TruStage competitors` | Run |
+| `research Google competitors` | Run |
 | `tell me about [BUILD] mode` | Run (tag not at position 0) |
 
 ### context.md schema by level
