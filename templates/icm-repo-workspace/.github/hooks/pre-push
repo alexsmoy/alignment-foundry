@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# ICM local guard — install with:
+#   cp .github/hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+# Blocks projects/ data from being pushed while on the main branch.
+branch=$(git symbolic-ref HEAD 2>/dev/null | sed 's|refs/heads/||')
+if [ "$branch" = "main" ]; then
+  if git diff --cached --name-only | grep -q '^projects/'; then
+    echo "ICM: projects/ data cannot be pushed to main. Use an output branch."
+    exit 1
+  fi
+fi

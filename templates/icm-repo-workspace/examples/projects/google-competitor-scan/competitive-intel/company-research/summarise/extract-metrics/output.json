@@ -1,0 +1,22 @@
+{
+  "company": "Alphabet Inc. (Google)",
+  "revenue": {
+    "value": "[illustrative] $90B",
+    "period": "Q1 2026 (three months ended 2026-03-31)",
+    "source": "https://example.com/alphabet/investor/q1-2026"
+  },
+  "revenue_growth_yoy": {
+    "value": "[illustrative] 12%",
+    "source": "https://example.com/news/alphabet-q1-cloud"
+  },
+  "notable_moves": [
+    {
+      "summary": "Expanded Gemini AI features across the Workspace product suite.",
+      "source": "https://example.com/news/google-gemini-workspace"
+    },
+    {
+      "summary": "Launched new generative AI features in Search.",
+      "source": "https://example.com/news/google-ai-search"
+    }
+  ]
+}

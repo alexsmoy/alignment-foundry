@@ -1,0 +1,5 @@
+{
+  "model": "claude-sonnet-4-5",
+  "allowedTools": ["Bash", "Read", "Write", "WebSearch"],
+  "mcpServers": {}
+}
