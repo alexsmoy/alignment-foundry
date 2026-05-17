@@ -200,15 +200,28 @@ pre code { background: transparent; color: var(--text); padding: 0; }
   flex-wrap: wrap;
 }
 
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border-bottom: none;
+}
+
+.site-logo {
+  display: block;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
 .site-title {
   font-weight: 700;
   font-size: 1.0625rem;
   letter-spacing: -0.005em;
   color: var(--white);
-  border-bottom: none;
 }
 
-.site-title:hover { color: var(--aquamarine); }
+.site-brand:hover .site-title { color: var(--aquamarine); }
 
 .site-nav {
   display: flex;
