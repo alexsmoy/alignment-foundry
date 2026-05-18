@@ -255,7 +255,9 @@ pre code { background: transparent; color: var(--text); padding: 0; }
 /* Page layout ============================================================ */
 
 .page {
-  padding: 3.5rem 0 5rem;
+  /* Longhand so it doesn't clobber the horizontal gutter from .container. */
+  padding-top: 3.5rem;
+  padding-bottom: 5rem;
 }
 
 .page-header {
