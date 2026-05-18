@@ -40,3 +40,11 @@ exclude:
   - vendor/
   - .bundle/
   - .jekyll-cache/
+
+# Force-include underscore-prefixed paths. Jekyll skips _-prefixed files and
+# folders by default; without this the ICM Workspace Explorer's _core/,
+# _memory/, and _state.md data files 404 when fetched from the file tree.
+include:
+  - _core
+  - _memory
+  - _state.md
